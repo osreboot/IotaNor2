@@ -1,11 +1,9 @@
-#include <iostream>
-#include <glfw/glfw3.h>
-#include <GL/gl.h>
+#include "src/display.h"
 
 using namespace std;
 
-int main(){
-    glfwInit();
+int main() {
+    Display::initialize();
 
     return 0;
 }
