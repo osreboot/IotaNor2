@@ -2,19 +2,39 @@
 
 #include "display.h"
 
-array<int, 2> size;
-GLFWwindow* window;
+namespace display {
 
-void Display::initialize() {
+    static GLFWwindow* window;
+    static pair<int, int> windowSize;
+
+    void initialize() {
+        windowSize = {1280, 720};
+
+        glfwInit();
+        glfwDefaultWindowHints();
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        window = glfwCreateWindow(windowSize.first, windowSize.second, "", nullptr, nullptr);
+        glfwMakeContextCurrent(window);
+    }
+
+    void preUpdate() {
+        glfwPollEvents();
+    }
+
+    void postUpdate() {
+        glfwSwapBuffers(window);
+    }
+
+    void close() {
+        glfwTerminate();
+    }
+
+    bool isExiting() {
+        return glfwWindowShouldClose(window) || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
+    }
+
+    const pair<int, int>& getSize() {
+        return windowSize;
+    }
 
 }
-
-void Display::preUpdate() {
-
-}
-
-void Display::postUpdate() {
-
-}
-
-

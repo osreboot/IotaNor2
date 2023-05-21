@@ -1,15 +1,18 @@
 #pragma once
 
-#include <array>
+#include <utility>
 
 using namespace std;
 
-namespace Display {
+namespace display {
 
     void initialize();
     void preUpdate();
     void postUpdate();
+    void close();
 
-    const array<int, 2>& getSize();
+    bool isExiting();
+
+    const pair<int, int>& getSize();
 
 }
