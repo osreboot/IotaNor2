@@ -1,5 +1,5 @@
+#include <GL/glew.h>
 #include <glfw/glfw3.h>
-
 #include "display.h"
 
 namespace display {
@@ -15,10 +15,14 @@ namespace display {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         window = glfwCreateWindow(windowSize.first, windowSize.second, "", nullptr, nullptr);
         glfwMakeContextCurrent(window);
+
+        glewInit();
     }
 
     void preUpdate() {
         glfwPollEvents();
+
+        glClear(GL_COLOR_BUFFER_BIT);
     }
 
     void postUpdate() {
