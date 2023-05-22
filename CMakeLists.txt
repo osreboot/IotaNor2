@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(${PROJECT_NAME} main.cpp)
 add_subdirectory(src)
 
-add_subdirectory(glfw)
+add_subdirectory(lib/glfw)
 
 add_definitions(-DGLEW_STATIC)
-add_subdirectory(glew)
+add_subdirectory(lib/glew)
 
 target_link_libraries(${PROJECT_NAME} glfw libglew_static)

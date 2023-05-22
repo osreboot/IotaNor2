@@ -5,4 +5,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         painter.cpp
         quad.h
         quad.cpp
+        texture.h
+        texture.cpp
         )

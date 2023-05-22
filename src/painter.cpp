@@ -1,9 +1,12 @@
-#include <GL/glew.h>
 #include <string>
 #include <fstream>
 #include <sstream>
+
+#include <GL/glew.h>
+
 #include "painter.h"
 #include "display.h"
+#include "texture.h"
 
 using namespace std;
 
@@ -57,16 +60,28 @@ namespace painter {
         glDeleteShader(idFragmentShader);
     }
 
-    void draw(Quad& quad, int texture, const Color& color) {
+    void draw(Quad& quad, const Texture& texture, const Color& color) {
         glUseProgram(idProgram);
 
         quad.setBufferToDisplay(display::getSize());
 
+        GLint uniformLocationT0 = glGetUniformLocation(idProgram, "textureSampler");
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture.getId());
+        glUniform1i(uniformLocationT0, 0);
+
         glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, quad.getId());
+        glBindBuffer(GL_ARRAY_BUFFER, quad.getVertexBufferId());
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, texture.getUvBufferId());
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
         glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
     }
 
 }

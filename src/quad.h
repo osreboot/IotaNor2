@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+
 #include <utility>
 
 using namespace std;
@@ -12,11 +13,11 @@ private:
     GLfloat coordsVertexBuffer[12];
 
 public:
-    Quad(float x, float y, float w, float h);
+    Quad(GLfloat x, GLfloat y, GLfloat w, GLfloat h);
     ~Quad();
 
-    void setBufferToDisplay(const pair<int, int>& displaySize);
+    void setBufferToDisplay(const pair<GLint, GLint>& displaySize);
 
-    GLuint getId() const { return idVertexBuffer; }
+    GLuint getVertexBufferId() const { return idVertexBuffer; }
 
 };

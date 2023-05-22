@@ -1,8 +1,13 @@
+#include <algorithm>
+
 #include <GL/glew.h>
+
 #include "quad.h"
 #include "util.h"
 
-Quad::Quad(float x, float y, float w, float h) {
+using namespace std;
+
+Quad::Quad(GLfloat x, GLfloat y, GLfloat w, GLfloat h) {
     GLfloat coordsVertexBufferTemp[] = {
             x, y,
             x + w, y,
@@ -11,9 +16,7 @@ Quad::Quad(float x, float y, float w, float h) {
             x + w, y + h,
             x + w, y,
     };
-    for(int i = 0; i < sizeof(coordsVertexBuffer) / sizeof(GLfloat); i++){
-        coordsVertexBuffer[i] = coordsVertexBufferTemp[i];
-    }
+    copy(begin(coordsVertexBufferTemp), end(coordsVertexBufferTemp), begin(coordsVertexBuffer));
 
     glGenBuffers(1, &idVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, idVertexBuffer);

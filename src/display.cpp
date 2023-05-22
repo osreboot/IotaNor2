@@ -1,11 +1,12 @@
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
+
 #include "display.h"
 
 namespace display {
 
     static GLFWwindow* window;
-    static pair<int, int> windowSize;
+    static pair<GLuint, GLuint> windowSize;
 
     void initialize() {
         windowSize = {1280, 720};
@@ -37,7 +38,7 @@ namespace display {
         return glfwWindowShouldClose(window) || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
     }
 
-    const pair<int, int>& getSize() {
+    const pair<GLuint, GLuint>& getSize() {
         return windowSize;
     }
 

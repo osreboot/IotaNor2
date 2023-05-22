@@ -2,6 +2,8 @@
 
 #include <utility>
 
+#include <GL/glew.h>
+
 using namespace std;
 
 namespace display {
@@ -13,6 +15,6 @@ namespace display {
 
     bool isExiting();
 
-    const pair<int, int>& getSize();
+    const pair<GLuint, GLuint>& getSize();
 
 }
