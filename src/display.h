@@ -16,5 +16,6 @@ namespace display {
     bool isExiting();
 
     const pair<GLuint, GLuint>& getSize();
+    const pair<GLfloat, GLfloat>& getCursor();
 
 }

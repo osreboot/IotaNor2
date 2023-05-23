@@ -7,6 +7,7 @@ namespace display {
 
     static GLFWwindow* window;
     static pair<GLuint, GLuint> windowSize;
+    static pair<GLfloat, GLfloat> locationCursor;
 
     void initialize() {
         windowSize = {1280, 720};
@@ -22,6 +23,11 @@ namespace display {
 
     void preUpdate() {
         glfwPollEvents();
+
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        locationCursor.first = static_cast<GLfloat>(x);
+        locationCursor.second = static_cast<GLfloat>(y);
 
         glClear(GL_COLOR_BUFFER_BIT);
     }
@@ -40,6 +46,10 @@ namespace display {
 
     const pair<GLuint, GLuint>& getSize() {
         return windowSize;
+    }
+
+    const pair<GLfloat, GLfloat>& getCursor() {
+        return locationCursor;
     }
 
 }

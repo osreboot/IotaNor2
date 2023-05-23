@@ -10,9 +10,10 @@ class Quad {
 
 private:
     GLuint idVertexBuffer;
-    GLfloat coordsVertexBuffer[12];
 
 public:
+    GLfloat x, y, w, h;
+
     Quad(GLfloat x, GLfloat y, GLfloat w, GLfloat h);
     ~Quad();
 

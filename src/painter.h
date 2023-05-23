@@ -4,7 +4,7 @@
 #include "texture.h"
 
 struct Color {
-    float r, g, b, a;
+    GLfloat r, g, b, a;
 };
 
 namespace painter {

@@ -14,6 +14,7 @@ int main() {
     high_resolution_clock::time_point timeLast = high_resolution_clock::now();
 
     Quad quad(100.0f, 100.0f, 512.0f, 512.0f);
+    Quad quadCursor(0.0f, 0.0f, 60.0f, 60.0f);
     Texture texture("../res/tile_ref_2c.png");
 
     while(!display::isExiting()) {
@@ -23,7 +24,12 @@ int main() {
 
         display::preUpdate();
 
-        painter::draw(quad, texture, {1.0f, 0.0f, 0.0f, 1.0f});
+        pair<GLfloat, GLfloat> locationCursor = display::getCursor();
+        quadCursor.x = locationCursor.first - (quadCursor.w / 2.0f);
+        quadCursor.y = locationCursor.second - (quadCursor.h / 2.0f);
+
+        painter::draw(quad, texture, {1.0f, 1.0f, 1.0f, 1.0f});
+        painter::draw(quadCursor, texture, {1.0f, 0.0f, 1.0f, 1.0f});
 
         display::postUpdate();
     }
