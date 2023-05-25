@@ -8,3 +8,5 @@ target_sources(${PROJECT_NAME} PRIVATE
         texture.h
         texture.cpp
         )
+
+add_subdirectory(game)

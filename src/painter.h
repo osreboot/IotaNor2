@@ -11,6 +11,6 @@ namespace painter {
 
     void initialize();
 
-    void draw(Quad& quad, const Texture& texture, const Color& color);
+    void draw(const Quad& quad, const Texture& texture, const Color& color);
 
 }

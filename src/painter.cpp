@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include <GL/glew.h>
+#include <iostream>
 
 #include "painter.h"
 #include "display.h"
@@ -60,7 +61,7 @@ namespace painter {
         glDeleteShader(idFragmentShader);
     }
 
-    void draw(Quad& quad, const Texture& texture, const Color& color) {
+    void draw(const Quad& quad, const Texture& texture, const Color& color) {
         glUseProgram(idProgram);
 
         quad.setBufferToDisplay(display::getSize());

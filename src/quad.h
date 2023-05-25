@@ -14,10 +14,11 @@ private:
 public:
     GLfloat x, y, w, h;
 
+    Quad();
     Quad(GLfloat x, GLfloat y, GLfloat w, GLfloat h);
     ~Quad();
 
-    void setBufferToDisplay(const pair<GLint, GLint>& displaySize);
+    void setBufferToDisplay(const pair<GLint, GLint>& displaySize) const;
 
     GLuint getVertexBufferId() const { return idVertexBuffer; }
 

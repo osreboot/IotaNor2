@@ -3,6 +3,7 @@
 #include "src/display.h"
 #include "src/painter.h"
 #include "src/texture.h"
+#include "src/game/render.h"
 
 using namespace std;
 using namespace chrono;
@@ -17,6 +18,8 @@ int main() {
     Quad quadCursor(0.0f, 0.0f, 60.0f, 60.0f);
     Texture texture("../res/tile_ref_2c.png");
 
+    Game game;
+
     while(!display::isExiting()) {
         high_resolution_clock::time_point timeNow = high_resolution_clock::now();
         float delta = (float)duration_cast<nanoseconds>(timeNow - timeLast).count() / 1000000000.0f;
@@ -24,12 +27,8 @@ int main() {
 
         display::preUpdate();
 
-        pair<GLfloat, GLfloat> locationCursor = display::getCursor();
-        quadCursor.x = locationCursor.first - (quadCursor.w / 2.0f);
-        quadCursor.y = locationCursor.second - (quadCursor.h / 2.0f);
-
-        painter::draw(quad, texture, {1.0f, 1.0f, 1.0f, 1.0f});
-        painter::draw(quadCursor, texture, {1.0f, 0.0f, 1.0f, 1.0f});
+        game.update(delta);
+        render::render(game);
 
         display::postUpdate();
     }
