@@ -14,7 +14,6 @@ public:
     Quad quadCursor;
     Texture textureTest;
     Texture textureTile;
-    Tile t1, t2, t3, t4;
 
     vector<Tile> tiles;
 

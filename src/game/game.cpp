@@ -7,11 +7,12 @@ Game::Game() :
         textureTest("../res/test.png"),
         textureTile("../res/tile_ref_3c.png") {
 
-    tiles.reserve(4);
-    tiles.emplace_back(0, 0);
-    tiles.emplace_back(1, 0);
-    tiles.emplace_back(-1, 0);
-    tiles.emplace_back(2, 0);
+    tiles.reserve(25);
+    for(int x = -2; x <= 2; x++) {
+        for(int y = -2; y <= 2; y++) {
+            tiles.emplace_back(x, y);
+        }
+    }
 }
 
 Game::~Game() {}
