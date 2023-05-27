@@ -11,6 +11,8 @@ class Game {
 private:
 
 public:
+    static const int BOARD_SIZE;
+
     Quad quadCursor;
     Texture textureTest;
     Texture textureTile;

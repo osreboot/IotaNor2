@@ -2,20 +2,24 @@
 #include "game.h"
 #include "../display.h"
 
+const int Game::BOARD_SIZE = 3;
+
 Game::Game() :
         quadCursor(0.0f, 0.0f, 384.0f, 384.0f),
         textureTest("../res/test.png"),
         textureTile("../res/tile_ref_3c.png") {
 
-    tiles.reserve(25);
-    for(int x = -2; x <= 2; x++) {
-        for(int y = -2; y <= 2; y++) {
+    int boardDim = BOARD_SIZE / 2;
+
+    tiles.reserve(BOARD_SIZE * BOARD_SIZE);
+    for(int x = -boardDim; x <= boardDim; x++) {
+        for(int y = -boardDim; y <= boardDim; y++) {
             tiles.emplace_back(x, y);
         }
     }
 }
 
-Game::~Game() {}
+Game::~Game() = default;
 
 void Game::update(float delta) {
     pair<GLfloat, GLfloat> locationCursor = display::getCursor();
