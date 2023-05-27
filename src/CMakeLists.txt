@@ -7,6 +7,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         quad.cpp
         texture.h
         texture.cpp
+        shader.h
+        shader.cpp
         )
 
 add_subdirectory(game)

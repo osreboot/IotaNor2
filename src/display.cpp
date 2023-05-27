@@ -29,6 +29,7 @@ namespace display {
         locationCursor.first = static_cast<GLfloat>(x);
         locationCursor.second = static_cast<GLfloat>(y);
 
+        glViewport(0, 0, windowSize.first, windowSize.second);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 

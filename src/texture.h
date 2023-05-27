@@ -8,7 +8,10 @@ private:
     GLuint idTexture, idUvBuffer;
 
 public:
-    Texture(const char* path);
+    Texture(Texture const&) = delete;
+    Texture& operator=(Texture const&) = delete;
+
+    explicit Texture(const char* path);
     ~Texture();
 
     GLuint getId() const { return idTexture; }
