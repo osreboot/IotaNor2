@@ -8,13 +8,15 @@ private:
     GLuint idTexture, idUvBuffer;
 
 public:
+    static Texture load(const char* path);
+
     Texture(Texture const&) = delete;
     Texture& operator=(Texture const&) = delete;
 
-    explicit Texture(const char* path);
+    Texture(GLsizei w, GLsizei h, const void* pixels);
     ~Texture();
 
-    GLuint getId() const { return idTexture; }
-    GLuint getUvBufferId() const { return idUvBuffer; }
+    const GLuint& getId() const { return idTexture; }
+    const GLuint& getUvBufferId() const { return idUvBuffer; }
 
 };

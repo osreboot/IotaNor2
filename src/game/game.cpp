@@ -2,16 +2,15 @@
 #include "game.h"
 #include "../display.h"
 
-const int Game::BOARD_SIZE = 3;
+const int Game::BOARD_DIM = 3;
 
 Game::Game() :
         quadCursor(0.0f, 0.0f, 384.0f, 384.0f),
-        textureTest("../res/test.png"),
-        textureTile("../res/tile_ref_3c.png") {
+        textureTest(Texture::load("../res/test.png")),
+        textureTile(Texture::load("../res/tile_ref_3c.png")) {
 
-    int boardDim = BOARD_SIZE / 2;
+    const int boardDim = BOARD_DIM / 2;
 
-    tiles.reserve(BOARD_SIZE * BOARD_SIZE);
     for(int x = -boardDim; x <= boardDim; x++) {
         for(int y = -boardDim; y <= boardDim; y++) {
             tiles.emplace_back(x, y);

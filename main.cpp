@@ -11,12 +11,9 @@ using namespace chrono;
 int main() {
     display::initialize();
     painter::initialize();
+    render::initialize();
 
     high_resolution_clock::time_point timeLast = high_resolution_clock::now();
-
-    Quad quad(100.0f, 100.0f, 512.0f, 512.0f);
-    Quad quadCursor(0.0f, 0.0f, 60.0f, 60.0f);
-    Texture texture("../res/tile_ref_2c.png");
 
     Game game;
 
@@ -32,6 +29,8 @@ int main() {
 
         display::postUpdate();
     }
+
+    render::cleanup();
 
     display::close();
     return 0;

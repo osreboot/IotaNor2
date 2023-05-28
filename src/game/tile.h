@@ -12,6 +12,9 @@ public:
     int x, y;
     Quad quad;
 
+    Tile(Tile const&) = delete;
+    Tile& operator=(Tile const&) = delete;
+
     Tile(int x, int y);
 
 };

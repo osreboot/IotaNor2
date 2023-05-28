@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <deque>
 
 #include "../quad.h"
 #include "../texture.h"
@@ -11,13 +11,13 @@ class Game {
 private:
 
 public:
-    static const int BOARD_SIZE;
+    static const int BOARD_DIM;
 
     Quad quadCursor;
     Texture textureTest;
     Texture textureTile;
 
-    vector<Tile> tiles;
+    deque<Tile> tiles;
 
     Game();
     ~Game();

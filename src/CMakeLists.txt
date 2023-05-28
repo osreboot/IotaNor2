@@ -7,6 +7,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         quad.cpp
         texture.h
         texture.cpp
+        texture_frame_buffer.h
+        texture_frame_buffer.cpp
         shader.h
         shader.cpp
         )
