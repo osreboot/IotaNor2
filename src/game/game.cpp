@@ -2,7 +2,7 @@
 #include "game.h"
 #include "../display.h"
 
-const int Game::BOARD_DIM = 3;
+const int Game::BOARD_DIM = 7;
 
 Game::Game() : quadCursor(0.0f, 0.0f, 384.0f, 384.0f) {
 
@@ -13,6 +13,7 @@ Game::Game() : quadCursor(0.0f, 0.0f, 384.0f, 384.0f) {
             tiles.emplace_back(x, y);
         }
     }
+
 }
 
 Game::~Game() = default;

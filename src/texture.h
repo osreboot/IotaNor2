@@ -5,7 +5,8 @@
 class Texture {
 
 private:
-    GLuint idTexture, idUvBuffer;
+    GLuint idTexture;
+    bool vFlip;
 
 public:
     static Texture load(const char* path);
@@ -13,10 +14,10 @@ public:
     Texture(Texture const&) = delete;
     Texture& operator=(Texture const&) = delete;
 
-    Texture(GLsizei w, GLsizei h, const void* pixels, bool uvFlipY);
+    Texture(GLsizei w, GLsizei h, const void* pixels, bool vFlip);
     ~Texture();
 
     const GLuint& getId() const { return idTexture; }
-    const GLuint& getUvBufferId() const { return idUvBuffer; }
+    const bool getVFlip() const { return vFlip; }
 
 };

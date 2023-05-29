@@ -13,7 +13,7 @@ Texture Texture::load(const char *path) {
     return {w, h, image, false};
 }
 
-Texture::Texture(GLsizei w, GLsizei h, const void* pixels, bool uvFlipY) {
+Texture::Texture(GLsizei w, GLsizei h, const void* pixels, bool vFlip) : vFlip(vFlip) {
     idTexture = 0; // Silence Clang warnings!
     glGenTextures(1, &idTexture);
     glBindTexture(GL_TEXTURE_2D, idTexture);
@@ -23,23 +23,8 @@ Texture::Texture(GLsizei w, GLsizei h, const void* pixels, bool uvFlipY) {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    GLfloat coordsUvBuffer[] = {
-            0.0f, 0.0f,
-            1.0f, 0.0f,
-            0.0f, uvFlipY ? -1.0f : 1.0f,
-            0.0f, uvFlipY ? -1.0f : 1.0f,
-            1.0f, uvFlipY ? -1.0f : 1.0f,
-            1.0f, 0.0f,
-    };
-
-    idUvBuffer = 0; // Silence Clang warnings!
-    glGenBuffers(1, &idUvBuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, idUvBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(coordsUvBuffer), coordsUvBuffer, GL_STATIC_DRAW);
 }
 
 Texture::~Texture() {
     glDeleteTextures(1, &idTexture);
-    glDeleteBuffers(1, &idUvBuffer);
 }

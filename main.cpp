@@ -25,7 +25,7 @@ int main() {
         display::preUpdate();
 
         game.update(delta);
-        render.render(game);
+        render.render(delta, game);
 
         display::postUpdate();
     }

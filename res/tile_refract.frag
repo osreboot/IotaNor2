@@ -25,7 +25,7 @@ vec2 map(vec2 x, vec2 inMin, vec2 inMax, vec2 outMin, vec2 outMax) {
 }
 
 vec2 getBackgroundSampleLocation(vec2 tileSampleLocation) {
-    return map(tileSampleLocation * tileSize + tileLocation, vec2(0.0), windowSize, vec2(0.0, 1.0), vec2(1.0, 0.0));
+    return clamp(vec2(1.0), vec2(0.0), map(tileSampleLocation * tileSize + tileLocation, vec2(0.0), windowSize, vec2(0.0, 1.0), vec2(1.0, 0.0)));
 }
 
 vec4 blend(vec4 color1, vec4 color0) {
@@ -65,34 +65,6 @@ void main() {
     vec4 colorRefDiag = blend(blend(colorRefUL, colorRefUR), blend(colorRefDL, colorRefDR));
 
     color = blend(colorRefC, blend(colorRefAdj, colorRefDiag));
-    //color = blend(color, vec4(0.04, 0.04, 0.04, 1.0));
+    //color = blend(color, vec4(0.02, 0.02, 0.02, 1.0));
     color *= vec4(1.0, 1.0, 1.0, texture(textureBase, uv).r) * textureColor;
-
-    /*
-    vec4 sampleC = texture(textureRefC, uv);
-    vec4 colorRefC = texture(textureBackground, getBackgroundSampleLocation(vec2(sampleC.g, sampleC.r)));
-    colorRefC *= sampleC.b;
-
-    vec4 sampleL = texture(textureRefL, uv);
-    vec4 colorRefL = texture(textureBackground, getBackgroundSampleLocation(vec2(sampleL.g - 1.0, sampleL.r)));
-    colorRefL *= sampleL.b;
-
-    vec4 sampleR = texture(textureRefL, vec2(1.0 - uv.x, uv.y));
-    vec4 colorRefR = texture(textureBackground, getBackgroundSampleLocation(vec2((1.0 - sampleR.g) + 1.0, sampleR.r)));
-    colorRefR *= sampleR.b;
-
-    vec4 sampleU = texture(textureRefL, vec2(uv.y, uv.x));
-    vec4 colorRefU = texture(textureBackground, getBackgroundSampleLocation(vec2(sampleU.r, sampleU.g - 1.0)));
-    colorRefU *= sampleU.b;
-
-    vec4 sampleD = texture(textureRefL, vec2(1.0 - uv.y, uv.x));
-    vec4 colorRefD = texture(textureBackground, getBackgroundSampleLocation(vec2(sampleD.r, (1.0 - sampleD.g) + 1.0)));
-    colorRefD *= sampleD.b;
-
-    vec4 colorRefHori = blend(colorRefL, colorRefR);
-    vec4 colorRefVert = blend(colorRefU, colorRefD);
-
-    color = blend(colorRefC, blend(colorRefVert, colorRefHori));
-    //color = blend(color, vec4(0.04, 0.04, 0.04, 1.0));
-    color *= vec4(1.0, 1.0, 1.0, texture(textureBase, uv).r) * textureColor;*/
 }

@@ -10,7 +10,7 @@ namespace display {
     static pair<GLfloat, GLfloat> locationCursor;
 
     void initialize() {
-        windowSize = {1280, 720};
+        windowSize = {1920, 1080};
 
         glfwInit();
         glfwDefaultWindowHints();

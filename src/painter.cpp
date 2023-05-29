@@ -23,7 +23,7 @@ namespace painter {
     void draw(const Quad& quad, const Texture& texture, const Shader& shader, const Color& color) {
         glUseProgram(shader.getProgramId());
 
-        quad.setBufferToDisplay(display::getSize());
+        quad.pushBuffer(texture.getVFlip(), display::getSize());
 
         GLint uniformLocationT0 = glGetUniformLocation(shader.getProgramId(), "textureBase");
         glActiveTexture(GL_TEXTURE0);
@@ -40,7 +40,7 @@ namespace painter {
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, texture.getUvBufferId());
+        glBindBuffer(GL_ARRAY_BUFFER, quad.getUvBufferId());
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
         glDrawArrays(GL_TRIANGLES, 0, 6);
