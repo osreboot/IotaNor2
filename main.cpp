@@ -11,11 +11,11 @@ using namespace chrono;
 int main() {
     display::initialize();
     painter::initialize();
-    render::initialize();
 
     high_resolution_clock::time_point timeLast = high_resolution_clock::now();
 
     Game game;
+    Render render;
 
     while(!display::isExiting()) {
         high_resolution_clock::time_point timeNow = high_resolution_clock::now();
@@ -25,12 +25,10 @@ int main() {
         display::preUpdate();
 
         game.update(delta);
-        render::render(game);
+        render.render(game);
 
         display::postUpdate();
     }
-
-    render::cleanup();
 
     display::close();
     return 0;

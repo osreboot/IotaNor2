@@ -12,7 +12,7 @@ private:
     TextureFBO(GLsizei w, GLsizei h, GLuint idFrameBuffer);
 
 public:
-    static TextureFBO* build(GLsizei w, GLsizei h);
+    static TextureFBO build(GLsizei w, GLsizei h);
 
     TextureFBO(TextureFBO const&) = delete;
     TextureFBO& operator=(TextureFBO const&) = delete;

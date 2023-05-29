@@ -14,8 +14,6 @@ public:
     static const int BOARD_DIM;
 
     Quad quadCursor;
-    Texture textureTest;
-    Texture textureTile;
 
     deque<Tile> tiles;
 

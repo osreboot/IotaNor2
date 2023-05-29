@@ -4,15 +4,28 @@
 #include "../painter.h"
 #include "../texture_frame_buffer.h"
 
-namespace render {
+class Render {
 
-    const Color WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
+private:
+    Shader shaderDefault, shaderRefract;
 
-    static Shader* shaderDefault;
-    static TextureFBO* fbo0;
+    TextureFBO frameBufferBackground;
 
-    void initialize();
-    void render(Game& game);
-    void cleanup();
+    Texture textureTest, textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
 
-}
+    Quad quadScreen;
+
+    float currentTileX = 0.0f, currentTileY = 0.0f;
+
+public:
+    static const Color WHITE;
+
+    Render(Render const&) = delete;
+    Render& operator=(Render const&) = delete;
+
+    Render();
+    ~Render();
+
+    void render(const Game& game);
+
+};

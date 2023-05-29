@@ -10,10 +10,10 @@ Texture Texture::load(const char *path) {
 
     int w, h;
     unsigned char* image = stbi_load(path, &w, &h, nullptr, 4);
-    return {w, h, image};
+    return {w, h, image, false};
 }
 
-Texture::Texture(GLsizei w, GLsizei h, const void* pixels) {
+Texture::Texture(GLsizei w, GLsizei h, const void* pixels, bool uvFlipY) {
     idTexture = 0; // Silence Clang warnings!
     glGenTextures(1, &idTexture);
     glBindTexture(GL_TEXTURE_2D, idTexture);
@@ -27,9 +27,9 @@ Texture::Texture(GLsizei w, GLsizei h, const void* pixels) {
     GLfloat coordsUvBuffer[] = {
             0.0f, 0.0f,
             1.0f, 0.0f,
-            0.0f, 1.0f,
-            0.0f, 1.0f,
-            1.0f, 1.0f,
+            0.0f, uvFlipY ? -1.0f : 1.0f,
+            0.0f, uvFlipY ? -1.0f : 1.0f,
+            1.0f, uvFlipY ? -1.0f : 1.0f,
             1.0f, 0.0f,
     };
 

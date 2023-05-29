@@ -13,7 +13,7 @@ public:
     Texture(Texture const&) = delete;
     Texture& operator=(Texture const&) = delete;
 
-    Texture(GLsizei w, GLsizei h, const void* pixels);
+    Texture(GLsizei w, GLsizei h, const void* pixels, bool uvFlipY);
     ~Texture();
 
     const GLuint& getId() const { return idTexture; }

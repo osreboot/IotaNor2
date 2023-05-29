@@ -2,20 +2,22 @@
 #include "texture_frame_buffer.h"
 #include "display.h"
 
-TextureFBO* TextureFBO::build(GLsizei w, GLsizei h) {
+TextureFBO TextureFBO::build(GLsizei w, GLsizei h) {
     GLuint idFrameBuffer = 0;
     glGenFramebuffers(1, &idFrameBuffer);
     glBindFramebuffer(GL_FRAMEBUFFER, idFrameBuffer);
 
-    return new TextureFBO(w, h, idFrameBuffer);
+    return {w, h, idFrameBuffer};
 }
 
 TextureFBO::TextureFBO(GLsizei w, GLsizei h, GLuint idFrameBuffer) :
-        Texture(w, h, 0), idFrameBuffer(idFrameBuffer) {
+        Texture(w, h, 0, true), idFrameBuffer(idFrameBuffer) {
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, getId(), 0);
 
     GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};
     glDrawBuffers(1, drawBuffers);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 TextureFBO::~TextureFBO() {

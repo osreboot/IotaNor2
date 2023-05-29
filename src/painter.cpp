@@ -15,6 +15,9 @@ namespace painter {
         GLuint idVertexArray;
         glGenVertexArrays(1, &idVertexArray);
         glBindVertexArray(idVertexArray);
+
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     void draw(const Quad& quad, const Texture& texture, const Shader& shader, const Color& color) {
@@ -22,7 +25,7 @@ namespace painter {
 
         quad.setBufferToDisplay(display::getSize());
 
-        GLint uniformLocationT0 = glGetUniformLocation(shader.getProgramId(), "textureSampler");
+        GLint uniformLocationT0 = glGetUniformLocation(shader.getProgramId(), "textureBase");
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture.getId());
         glUniform1i(uniformLocationT0, 0);

@@ -4,10 +4,7 @@
 
 const int Game::BOARD_DIM = 3;
 
-Game::Game() :
-        quadCursor(0.0f, 0.0f, 384.0f, 384.0f),
-        textureTest(Texture::load("../res/test.png")),
-        textureTile(Texture::load("../res/tile_ref_3c.png")) {
+Game::Game() : quadCursor(0.0f, 0.0f, 384.0f, 384.0f) {
 
     const int boardDim = BOARD_DIM / 2;
 
