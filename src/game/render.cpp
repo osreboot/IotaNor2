@@ -1,11 +1,12 @@
 
 #include "render.h"
 #include "../display.h"
+#include "../util.h"
 
 const Color Render::WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
 const Color Render::BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
 
-Render::Render() :
+Render::Render(Game& game) :
         shaderDefault("../res/default.vert", "../res/default.frag", [](const GLuint&){}),
         shaderRefract("../res/default.vert", "../res/tile_refract.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
@@ -45,15 +46,42 @@ Render::Render() :
         textureTest(Texture::load("../res/test.png")),
         textureNoise(Texture::load("../res/noise.png")),
         textureTileMask(Texture::load("../res/tile_mask.png")),
-        textureTileRefC(Texture::load("../res/tile_ref_7c.png")),
-        textureTileRefL(Texture::load("../res/tile_ref_7l.png")),
-        textureTileRefUL(Texture::load("../res/tile_ref_7ul.png")),
+        textureTileRefC(Texture::load("../res/tile_ref_4c.png")),
+        textureTileRefL(Texture::load("../res/tile_ref_4l.png")),
+        textureTileRefUL(Texture::load("../res/tile_ref_4ul.png")),
+        textureTileHighlighted(Texture::load("../res/tile_highlighted.png")),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)) {
+
+    for (int x = 0; x < Game::BOARD_DIM; x++) {
+        for (int y = 0; y < Game::BOARD_DIM; y++) {
+            Tile& tile = game.tiles[x][y];
+
+            std::pair<float, float> world = Game::getWorld(x, y);
+            tile.quadLocked.w = tile.visualSize;
+            tile.quadLocked.h = tile.visualSize;
+            tile.quadLocked.x = world.first;
+            tile.quadLocked.y = world.second;
+        }
+    }
 
 }
 
-void Render::render(float delta, const Game& game) {
+void Render::render(float delta, Game& game) {
     timer += delta;
+
+    // Update tile visuals
+    for (int x = 0; x < Game::BOARD_DIM; x++) {
+        for (int y = 0; y < Game::BOARD_DIM; y++) {
+            Tile& tile = game.tiles[x][y];
+            stepTowards(tile.visualSize, delta * 200.0f, Tile::SIZE);
+
+            std::pair<float, float> world = Game::getWorld(x, y);
+            tile.quad.w = tile.visualSize;
+            tile.quad.h = tile.visualSize;
+            tile.quad.x = world.first + (Tile::SIZE / 2.0f) - (tile.visualSize / 2.0f);
+            tile.quad.y = world.second + (Tile::SIZE / 2.0f) - (tile.visualSize / 2.0f);
+        }
+    }
 
     // Capture fire elements
     quadScreen.setUVs((timer / 40.0f), (timer / 20.0f), (timer / 40.0f) + 1.0f, (timer / 20.0f) + 0.4f);
@@ -68,25 +96,41 @@ void Render::render(float delta, const Game& game) {
 
     // Capture game elements
     fboGameContent.capture(true, [&](){
-        for(const Tile& tile : game.tiles) {
-            if(tile.illum) painter::draw(tile.quad, textureTileMask, shaderDefault, WHITE);
+        for (int x = 0; x < Game::BOARD_DIM; x++) {
+            for (int y = 0; y < Game::BOARD_DIM; y++) {
+                if (game.tiles[x][y].illuminated) painter::draw(game.tiles[x][y].quad, textureTileMask, shaderDefault, WHITE);
+            }
         }
     });
 
     // Capture all background elements (so they can be processed by the tile refraction shader)
     fboRefractedContent.capture(true, [&](){
         painter::draw(quadScreen, fboGameContent, shaderFire, WHITE);
-        painter::draw(game.quadCursor, textureTest, shaderDefault, WHITE);
+        painter::draw(game.quadDebugCursor, textureTest, shaderDefault, WHITE);
     });
 
     // Display all background elements
     painter::draw(quadScreen, fboRefractedContent, shaderDefault, WHITE);
 
-    // Display tiles
-    for(const Tile& tile : game.tiles) {
-        currentTileQuad = &tile.quad;
-        painter::draw(tile.quad, textureTileMask, shaderRefract, WHITE);
+    // Display tiles (separated to draw larger tiles on top)
+    for (int x = 0; x < Game::BOARD_DIM; x++) {
+        for (int y = 0; y < Game::BOARD_DIM; y++) {
+            if (game.tiles[x][y].visualSize <= Tile::SIZE) {
+                currentTileQuad = &game.tiles[x][y].quad;
+                painter::draw(game.tiles[x][y].quad, textureTileMask, shaderRefract, WHITE);
+            }
+        }
     }
+    for (int x = 0; x < Game::BOARD_DIM; x++) {
+        for (int y = 0; y < Game::BOARD_DIM; y++) {
+            if (game.tiles[x][y].visualSize > Tile::SIZE) {
+                currentTileQuad = &game.tiles[x][y].quad;
+                painter::draw(game.tiles[x][y].quad, textureTileMask, shaderRefract, WHITE);
+            }
+        }
+    }
+
+    painter::draw(game.quadCursor, textureTileHighlighted, shaderDefault, WHITE);
 
 }
 

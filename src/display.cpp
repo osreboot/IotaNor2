@@ -6,8 +6,8 @@
 namespace display {
 
     static GLFWwindow* window;
-    static pair<GLuint, GLuint> windowSize;
-    static pair<GLfloat, GLfloat> locationCursor;
+    static std::pair<GLuint, GLuint> windowSize;
+    static std::pair<GLfloat, GLfloat> locationCursor;
 
     void initialize() {
         windowSize = {1920, 1080};
@@ -45,11 +45,11 @@ namespace display {
         return glfwWindowShouldClose(window) || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
     }
 
-    const pair<GLuint, GLuint>& getSize() {
+    const std::pair<GLuint, GLuint>& getSize() {
         return windowSize;
     }
 
-    const pair<GLfloat, GLfloat>& getCursor() {
+    const std::pair<GLfloat, GLfloat>& getCursor() {
         return locationCursor;
     }
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <deque>
-
 #include "../quad.h"
 #include "../texture.h"
 #include "tile.h"
@@ -11,11 +9,14 @@ class Game {
 private:
 
 public:
-    static const int BOARD_DIM;
+    static const int BOARD_DIM = 7;
 
-    Quad quadCursor;
+    static std::pair<float, float> getWorld(int tileX, int tileY);
+    static std::pair<int, int> getTile(float worldX, float worldY);
 
-    deque<Tile> tiles;
+    Quad quadDebugCursor, quadCursor;
+
+    Tile tiles[BOARD_DIM][BOARD_DIM];
 
     Game();
     ~Game();

@@ -13,7 +13,7 @@ private:
     TextureFBO fboGameContent, fboRefractedContent;
 
     Texture textureTest, textureNoise;
-    Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
+    Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL, textureTileHighlighted;
 
     Quad quadScreen;
 
@@ -28,9 +28,9 @@ public:
     Render(Render const&) = delete;
     Render& operator=(Render const&) = delete;
 
-    Render();
+    explicit Render(Game& game);
     ~Render();
 
-    void render(float delta, const Game& game);
+    void render(float delta, Game& game);
 
 };

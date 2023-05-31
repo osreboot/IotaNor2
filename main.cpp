@@ -15,7 +15,7 @@ int main() {
     high_resolution_clock::time_point timeLast = high_resolution_clock::now();
 
     Game game;
-    Render render;
+    Render render(game);
 
     while(!display::isExiting()) {
         high_resolution_clock::time_point timeNow = high_resolution_clock::now();

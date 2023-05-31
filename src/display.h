@@ -4,8 +4,6 @@
 
 #include <GL/glew.h>
 
-using namespace std;
-
 namespace display {
 
     void initialize();
@@ -15,7 +13,7 @@ namespace display {
 
     bool isExiting();
 
-    const pair<GLuint, GLuint>& getSize();
-    const pair<GLfloat, GLfloat>& getCursor();
+    const std::pair<GLuint, GLuint>& getSize();
+    const std::pair<GLfloat, GLfloat>& getCursor();
 
 }

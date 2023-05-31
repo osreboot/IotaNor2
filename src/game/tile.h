@@ -7,16 +7,16 @@ class Tile {
 private:
 
 public:
-    static const float SIZE;
+    static const float SIZE, SIZE_S, SIZE_L;
 
-    int x, y;
-    bool illum;
+    bool illuminated;
+    float visualSize;
 
-    Quad quad;
+    Quad quad, quadLocked;
 
     Tile(Tile const&) = delete;
     Tile& operator=(Tile const&) = delete;
 
-    Tile(int x, int y);
+    Tile();
 
 };
