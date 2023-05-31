@@ -7,19 +7,23 @@
 class Render {
 
 private:
-    Shader shaderDefault, shaderRefract, shaderBackgroundFire;
+    Shader shaderDefault, shaderFire, shaderRefract;
 
-    TextureFBO fboBackgroundFire0, fboBackgroundFire1, fboBackground;
+    TextureFBO fboFire0, fboFire1;
+    TextureFBO fboGameContent, fboRefractedContent;
 
-    Texture textureTest, textureNoise, textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
+    Texture textureTest, textureNoise;
+    Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
 
     Quad quadScreen;
 
     float timer = 0.0f;
-    float currentTileX = 0.0f, currentTileY = 0.0f;
+
+    const Quad* currentTileQuad = nullptr;
 
 public:
     static const Color WHITE;
+    static const Color BLACK;
 
     Render(Render const&) = delete;
     Render& operator=(Render const&) = delete;

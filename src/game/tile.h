@@ -10,6 +10,8 @@ public:
     static const float SIZE;
 
     int x, y;
+    bool illum;
+
     Quad quad;
 
     Tile(Tile const&) = delete;

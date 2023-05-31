@@ -29,7 +29,8 @@ vec2 getBackgroundSampleLocation(vec2 tileSampleLocation) {
 }
 
 vec4 blend(vec4 color1, vec4 color0) {
-    return vec4(max(color1.r, color0.r), max(color1.g, color0.g), max(color1.b, color0.b), 1.0);
+    return vec4(color1.rgb + color0.rgb, 1.0);
+    //return vec4(max(color1.r, color0.r), max(color1.g, color0.g), max(color1.b, color0.b), 1.0);
 
     // Source: https://stackoverflow.com/questions/28900598/how-to-combine-two-colors-with-varying-alpha-values
 /*float a01 = (1.0 - color0.a) * color1.a + color0.a;
