@@ -1,10 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
-
-#include <utility>
-
-using namespace std;
+#include "types.h"
 
 class Quad {
 
@@ -22,7 +18,7 @@ public:
     Quad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat u0, GLfloat v0, GLfloat u1, GLfloat v1);
     ~Quad();
 
-    void pushBuffer(bool vFlip, const pair<GLint, GLint>& displaySize) const;
+    void pushBuffer(bool vFlip, const Coordw& displaySize) const;
 
     void setUVs(GLfloat u0, GLfloat v0, GLfloat u1, GLfloat v1);
 

@@ -1,10 +1,8 @@
-#include <GL/glew.h>
+
 #include <iostream>
 
-#include "quad.h"
+#include "graphics/quad.h"
 #include "util.h"
-
-using namespace std;
 
 Quad::Quad() : Quad(0.0f, 0.0f, 0.0f, 0.0f) {}
 
@@ -29,7 +27,7 @@ Quad::~Quad() {
     glDeleteBuffers(1, &idUvBuffer);
 }
 
-void Quad::pushBuffer(bool vFlip, const pair<int, int>& displaySize) const {
+void Quad::pushBuffer(bool vFlip, const Coordw& displaySize) const {
     GLfloat coordsVertexBuffer[] = {
             x, y,
             x + w, y,

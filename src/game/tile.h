@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../quad.h"
+#include "graphics/quad.h"
 
 class Tile {
 

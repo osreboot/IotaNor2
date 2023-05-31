@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/glew.h>
+#include "types.h"
 
 class Texture {
 
@@ -14,7 +14,7 @@ public:
     Texture(Texture const&) = delete;
     Texture& operator=(Texture const&) = delete;
 
-    Texture(GLsizei w, GLsizei h, const void* pixels, bool vFlip);
+    Texture(Coordw size, const void* pixels, bool vFlip, bool mipmap);
     ~Texture();
 
     const GLuint& getId() const { return idTexture; }

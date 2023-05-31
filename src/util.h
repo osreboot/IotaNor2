@@ -6,8 +6,8 @@ inline float map(float x, float inMin, float inMax, float outMin, float outMax) 
 
 inline void stepTowards(float& x, float delta, float goal) {
     if (goal > x) {
-        if (x + abs(delta) < goal) x = x + abs(delta); else x = goal;
+        if (x + std::abs(delta) < goal) x = x + std::abs(delta); else x = goal;
     } else {
-        if (x - abs(delta) > goal) x = x - abs(delta); else x = goal;
+        if (x - std::abs(delta) > goal) x = x - std::abs(delta); else x = goal;
     }
 }

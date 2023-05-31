@@ -1,11 +1,11 @@
 
 #include <cmath>
 
-#include "game.h"
-#include "../display.h"
-#include "../util.h"
+#include "game/game.h"
+#include "graphics/display.h"
+#include "util.h"
 
-std::pair<float, float> Game::getWorld(int tileX, int tileY) {
+Coordf Game::getWorld(int tileX, int tileY) {
     const std::pair<GLsizei, GLsizei>& windowSize = display::getSize();
     const float worldTileMinX = (static_cast<float>(windowSize.first) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMinY = (static_cast<float>(windowSize.second) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
@@ -16,7 +16,7 @@ std::pair<float, float> Game::getWorld(int tileX, int tileY) {
             map(static_cast<float>(tileY), 0, BOARD_DIM, worldTileMinY, worldTileMaxY)};
 }
 
-std::pair<int, int> Game::getTile(float worldX, float worldY) {
+Coordi Game::getTile(float worldX, float worldY) {
     const std::pair<GLsizei, GLsizei>& windowSize = display::getSize();
     const float worldTileMinX = (static_cast<float>(windowSize.first) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMinY = (static_cast<float>(windowSize.second) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);

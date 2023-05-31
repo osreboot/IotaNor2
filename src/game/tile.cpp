@@ -1,5 +1,6 @@
 
 #include <cstdlib>
+
 #include "tile.h"
 
 const float Tile::SIZE = 128.0f;

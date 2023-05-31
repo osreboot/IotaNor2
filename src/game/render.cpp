@@ -1,14 +1,14 @@
 
-#include "render.h"
-#include "../display.h"
-#include "../util.h"
+#include "game/render.h"
+#include "graphics/display.h"
+#include "util.h"
 
 const Color Render::WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
 const Color Render::BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
 
 Render::Render(Game& game) :
-        shaderDefault("../res/default.vert", "../res/default.frag", [](const GLuint&){}),
-        shaderRefract("../res/default.vert", "../res/tile_refract.frag", [&](const GLuint& idProgram){
+        shaderDefault("../res/shader/default.vert", "../res/shader/default.frag", [](const GLuint&){}),
+        shaderRefract("../res/shader/default.vert", "../res/shader/tile_refract.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboRefractedContent.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureBackground"), 1);
@@ -30,7 +30,7 @@ Render::Render(Game& game) :
             glUniform2f(glGetUniformLocation(idProgram, "tileSize"), currentTileQuad->w, currentTileQuad->h);
             glUniform2f(glGetUniformLocation(idProgram, "tileLocation"), currentTileQuad->x, currentTileQuad->y);
         }),
-        shaderFire("../res/default.vert", "../res/fire.frag", [&](const GLuint& idProgram){
+        shaderFire("../res/shader/default.vert", "../res/shader/fire.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboFire0.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureFire0"), 1);
@@ -39,17 +39,18 @@ Render::Render(Game& game) :
             glBindTexture(GL_TEXTURE_2D, fboFire1.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureFire1"), 2);
         }),
-        fboFire0(TextureFBO::build(static_cast<GLsizei>(display::getSize().first), static_cast<GLsizei>(display::getSize().second))),
-        fboFire1(TextureFBO::build(static_cast<GLsizei>(display::getSize().first), static_cast<GLsizei>(display::getSize().second))),
-        fboGameContent(TextureFBO::build(static_cast<GLsizei>(display::getSize().first), static_cast<GLsizei>(display::getSize().second))),
-        fboRefractedContent(TextureFBO::build(static_cast<GLsizei>(display::getSize().first), static_cast<GLsizei>(display::getSize().second))),
-        textureTest(Texture::load("../res/test.png")),
-        textureNoise(Texture::load("../res/noise.png")),
-        textureTileMask(Texture::load("../res/tile_mask.png")),
-        textureTileRefC(Texture::load("../res/tile_ref_4c.png")),
-        textureTileRefL(Texture::load("../res/tile_ref_4l.png")),
-        textureTileRefUL(Texture::load("../res/tile_ref_4ul.png")),
-        textureTileHighlighted(Texture::load("../res/tile_highlighted.png")),
+        fboFire0(TextureFBO::build(display::getSize())),
+        fboFire1(TextureFBO::build(display::getSize())),
+        fboGameContent(TextureFBO::build(display::getSize())),
+        fboRefractedContent(TextureFBO::build(display::getSize())),
+        textureTest(Texture::load("../res/texture/ui/test.png")),
+        textureNoise(Texture::load("../res/texture/ui/noise.png")),
+        textureTileMask(Texture::load("../res/texture/material/tile_mask.png")),
+        textureTileRefC(Texture::load("../res/texture/material/tile_ref_4c.png")),
+        textureTileRefL(Texture::load("../res/texture/material/tile_ref_4l.png")),
+        textureTileRefUL(Texture::load("../res/texture/material/tile_ref_4ul.png")),
+        textureUiTileLit(Texture::load("../res/texture/ui/tile_highlighted.png")),
+        textureUiTileSwap(Texture::load("../res/texture/ui/tile_swap.png")),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)) {
 
     for (int x = 0; x < Game::BOARD_DIM; x++) {
@@ -75,7 +76,7 @@ void Render::render(float delta, Game& game) {
             Tile& tile = game.tiles[x][y];
             stepTowards(tile.visualSize, delta * 200.0f, Tile::SIZE);
 
-            std::pair<float, float> world = Game::getWorld(x, y);
+            Coordf world = Game::getWorld(x, y);
             tile.quad.w = tile.visualSize;
             tile.quad.h = tile.visualSize;
             tile.quad.x = world.first + (Tile::SIZE / 2.0f) - (tile.visualSize / 2.0f);
@@ -106,7 +107,7 @@ void Render::render(float delta, Game& game) {
     // Capture all background elements (so they can be processed by the tile refraction shader)
     fboRefractedContent.capture(true, [&](){
         painter::draw(quadScreen, fboGameContent, shaderFire, WHITE);
-        painter::draw(game.quadDebugCursor, textureTest, shaderDefault, WHITE);
+        //painter::draw(game.quadDebugCursor, textureTest, shaderDefault, WHITE);
     });
 
     // Display all background elements
@@ -130,7 +131,10 @@ void Render::render(float delta, Game& game) {
         }
     }
 
-    painter::draw(game.quadCursor, textureTileHighlighted, shaderDefault, WHITE);
+    glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+    painter::draw(game.quadCursor, textureUiTileSwap, shaderDefault, WHITE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    painter::draw(game.quadCursor, textureUiTileLit, shaderDefault, WHITE);
 
 }
 

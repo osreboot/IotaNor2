@@ -1,13 +1,9 @@
-#include <string>
 
 #include <GL/glew.h>
 
-
-#include "painter.h"
-#include "display.h"
-#include "texture.h"
-
-using namespace std;
+#include "graphics/display.h"
+#include "graphics/painter.h"
+#include "graphics/texture.h"
 
 namespace painter {
 

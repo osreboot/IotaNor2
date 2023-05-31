@@ -1,8 +1,6 @@
 #pragma once
 
-#include <utility>
-
-#include <GL/glew.h>
+#include "types.h"
 
 namespace display {
 
@@ -13,7 +11,7 @@ namespace display {
 
     bool isExiting();
 
-    const std::pair<GLuint, GLuint>& getSize();
-    const std::pair<GLfloat, GLfloat>& getCursor();
+    const Coordw& getSize();
+    const Coordf& getCursor();
 
 }

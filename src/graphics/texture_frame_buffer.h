@@ -2,17 +2,17 @@
 
 #include <functional>
 
-#include "texture.h"
+#include "graphics/texture.h"
 
 class TextureFBO : public Texture {
 
 private:
     GLuint idFrameBuffer;
 
-    TextureFBO(GLsizei w, GLsizei h, GLuint idFrameBuffer);
+    TextureFBO(Coordw size, GLuint idFrameBuffer);
 
 public:
-    static TextureFBO build(GLsizei w, GLsizei h);
+    static TextureFBO build(Coordw size);
 
     TextureFBO(TextureFBO const&) = delete;
     TextureFBO& operator=(TextureFBO const&) = delete;

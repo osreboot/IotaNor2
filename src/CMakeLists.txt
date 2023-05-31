@@ -1,16 +1,23 @@
 target_sources(${PROJECT_NAME} PRIVATE
-        display.h
-        display.cpp
-        painter.h
-        painter.cpp
-        quad.h
-        quad.cpp
-        texture.h
-        texture.cpp
-        texture_frame_buffer.h
-        texture_frame_buffer.cpp
-        shader.h
-        shader.cpp
+        game/game.h
+        game/game.cpp
+        game/render.h
+        game/render.cpp
+        game/tile.h
+        game/tile.cpp
+        graphics/display.h
+        graphics/display.cpp
+        graphics/painter.h
+        graphics/painter.cpp
+        graphics/quad.h
+        graphics/quad.cpp
+        graphics/shader.h
+        graphics/shader.cpp
+        graphics/texture.h
+        graphics/texture.cpp
+        graphics/texture_frame_buffer.h
+        graphics/texture_frame_buffer.cpp
+        main.cpp
+        types.h
+        util.h
         )
-
-add_subdirectory(game)

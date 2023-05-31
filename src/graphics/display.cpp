@@ -1,3 +1,4 @@
+
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
 
@@ -6,8 +7,8 @@
 namespace display {
 
     static GLFWwindow* window;
-    static std::pair<GLuint, GLuint> windowSize;
-    static std::pair<GLfloat, GLfloat> locationCursor;
+    static Coordw windowSize;
+    static Coordf locationCursor;
 
     void initialize() {
         windowSize = {1920, 1080};
@@ -45,11 +46,11 @@ namespace display {
         return glfwWindowShouldClose(window) || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
     }
 
-    const std::pair<GLuint, GLuint>& getSize() {
+    const Coordw& getSize() {
         return windowSize;
     }
 
-    const std::pair<GLfloat, GLfloat>& getCursor() {
+    const Coordf& getCursor() {
         return locationCursor;
     }
 

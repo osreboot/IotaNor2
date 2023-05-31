@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../quad.h"
-#include "../texture.h"
-#include "tile.h"
+#include "game/tile.h"
+#include "graphics/quad.h"
+#include "graphics/texture.h"
 
 class Game {
 
@@ -11,8 +11,8 @@ private:
 public:
     static const int BOARD_DIM = 7;
 
-    static std::pair<float, float> getWorld(int tileX, int tileY);
-    static std::pair<int, int> getTile(float worldX, float worldY);
+    static Coordf getWorld(int tileX, int tileY);
+    static Coordi getTile(float worldX, float worldY);
 
     Quad quadDebugCursor, quadCursor;
 

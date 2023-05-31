@@ -1,8 +1,8 @@
 #pragma once
 
-#include "game.h"
-#include "../painter.h"
-#include "../texture_frame_buffer.h"
+#include "game/game.h"
+#include "graphics/painter.h"
+#include "graphics/texture_frame_buffer.h"
 
 class Render {
 
@@ -13,7 +13,8 @@ private:
     TextureFBO fboGameContent, fboRefractedContent;
 
     Texture textureTest, textureNoise;
-    Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL, textureTileHighlighted;
+    Texture textureUiTileLit, textureUiTileSwap;
+    Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
 
     Quad quadScreen;
 

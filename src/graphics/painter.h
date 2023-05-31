@@ -1,8 +1,8 @@
 #pragma once
 
-#include "quad.h"
-#include "texture.h"
-#include "shader.h"
+#include "graphics/quad.h"
+#include "graphics/shader.h"
+#include "graphics/texture.h"
 
 struct Color {
     GLfloat r, g, b, a;
