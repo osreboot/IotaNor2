@@ -2,6 +2,9 @@
 #include <cmath>
 #include <functional>
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "game/game.h"
 #include "graphics/display.h"
 #include "util.h"
@@ -49,11 +52,35 @@ void Game::update(float delta) {
     quadDebugCursor.x = locationCursor.first - 192.0f;
     quadDebugCursor.y = locationCursor.second - 192.0f;
 
-    Coordi tileCursor = getTile(locationCursor);
     Group& group = groups.front();
+
+    // Handle group rotations
+    if (display::hasEventKeyPress(GLFW_KEY_A)) {
+        group.rotateCCW();
+    } else if (display::hasEventKeyPress(GLFW_KEY_D)) {
+        group.rotateCW();
+    }
+
+    // Clamp group position
+    Coordi tileCursor = getTile(locationCursor);
     tileCursor.first = std::clamp(static_cast<int>(tileCursor.first), group.padL, BOARD_DIM - 1 - group.padR);
     tileCursor.second = std::clamp(static_cast<int>(tileCursor.second), group.padU, BOARD_DIM - 1 - group.padD);
     group.location = getWorld(tileCursor);
     group.location.first += Tile::SIZE / 2.0f;
     group.location.second += Tile::SIZE / 2.0f;
+
+    // Handle group placing
+    if (display::hasEventMouseRelease()) {
+        for (int x = 0; x < Group::DIM; x++) {
+            for (int y = 0; y < Group::DIM; y++) {
+                if (group.tiles[y * Group::DIM + x]) {
+                    Tile& tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y - (Group::DIM / 2)];
+                    tile.illuminated = !tile.illuminated;
+                }
+            }
+        }
+
+        groups.pop_front();
+        groups.emplace_back();
+    }
 }

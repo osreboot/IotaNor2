@@ -1,8 +1,17 @@
 
+#include <map>
+
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
 
 #include "display.h"
+
+static bool eventMouseRelease;
+static std::map<int, bool> keyStatesLast;
+
+void callbackMouseButton(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) eventMouseRelease = true;
+}
 
 namespace display {
 
@@ -19,10 +28,14 @@ namespace display {
         window = glfwCreateWindow(windowSize.first, windowSize.second, "", glfwGetPrimaryMonitor(), nullptr);
         glfwMakeContextCurrent(window);
 
+        glfwSetMouseButtonCallback(window, callbackMouseButton);
+
         glewInit();
     }
 
     void preUpdate() {
+        eventMouseRelease = false;
+
         glfwPollEvents();
 
         double x, y;
@@ -36,6 +49,10 @@ namespace display {
 
     void postUpdate() {
         glfwSwapBuffers(window);
+
+        for (const auto &keyState : keyStatesLast) {
+            keyStatesLast[keyState.first] = glfwGetKey(window, keyState.first) == GLFW_PRESS;
+        }
     }
 
     void close() {
@@ -52,6 +69,24 @@ namespace display {
 
     const Coordf& getCursor() {
         return locationCursor;
+    }
+
+    bool hasEventMouseRelease() {
+        return eventMouseRelease;
+    }
+
+    bool hasEventKeyPress(int key) {
+        if(!keyStatesLast.count(key)) {
+            keyStatesLast[key] = glfwGetKey(window, key) == GLFW_PRESS;
+            return false;
+        } else return glfwGetKey(window, key) == GLFW_PRESS && keyStatesLast.count(key) && !keyStatesLast[key];
+    }
+
+    bool hasEventKeyRelease(int key) {
+        if(!keyStatesLast.count(key)) {
+            keyStatesLast[key] = glfwGetKey(window, key) == GLFW_PRESS;
+            return false;
+        } else return glfwGetKey(window, key) == GLFW_RELEASE && keyStatesLast.count(key) && keyStatesLast[key];
     }
 
 }

@@ -5,6 +5,7 @@
 class Group {
 
 private:
+    void calculatePadding();
 
 public:
     static const int DIM = 3;
@@ -16,5 +17,8 @@ public:
 
     Group();
     ~Group();
+
+    void rotateCW();
+    void rotateCCW();
 
 };
