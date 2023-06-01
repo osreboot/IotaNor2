@@ -16,7 +16,7 @@ namespace display {
         glfwInit();
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        window = glfwCreateWindow(windowSize.first, windowSize.second, "", nullptr, nullptr);
+        window = glfwCreateWindow(windowSize.first, windowSize.second, "", glfwGetPrimaryMonitor(), nullptr);
         glfwMakeContextCurrent(window);
 
         glewInit();

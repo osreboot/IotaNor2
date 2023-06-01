@@ -22,6 +22,8 @@ private:
 
     const Quad* currentTileQuad = nullptr;
 
+    void render(Group& group);
+
 public:
     static const Color WHITE;
     static const Color BLACK;
@@ -30,7 +32,6 @@ public:
     Render& operator=(Render const&) = delete;
 
     explicit Render(Game& game);
-    ~Render();
 
     void render(float delta, Game& game);
 

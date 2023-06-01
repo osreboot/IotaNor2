@@ -1,6 +1,8 @@
 #pragma once
 
-#include "game/tile.h"
+#include <deque>
+
+#include "game/group.h"
 #include "graphics/quad.h"
 #include "graphics/texture.h"
 
@@ -10,16 +12,18 @@ private:
 
 public:
     static const int BOARD_DIM = 7;
+    static const int GROUP_QUEUE_SIZE = 4;
 
-    static Coordf getWorld(int tileX, int tileY);
-    static Coordi getTile(float worldX, float worldY);
+    static Coordf getWorld(Coordi tile);
+    static Coordi getTile(Coordf world);
 
-    Quad quadDebugCursor, quadCursor;
+    Quad quadDebugCursor;
 
     Tile tiles[BOARD_DIM][BOARD_DIM];
 
+    std::deque<Group> groups;
+
     Game();
-    ~Game();
 
     void update(float delta);
 

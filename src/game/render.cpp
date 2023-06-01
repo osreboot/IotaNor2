@@ -53,36 +53,10 @@ Render::Render(Game& game) :
         textureUiTileSwap(Texture::load("../res/texture/ui/tile_swap.png")),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)) {
 
-    for (int x = 0; x < Game::BOARD_DIM; x++) {
-        for (int y = 0; y < Game::BOARD_DIM; y++) {
-            Tile& tile = game.tiles[x][y];
-
-            std::pair<float, float> world = Game::getWorld(x, y);
-            tile.quadLocked.w = tile.visualSize;
-            tile.quadLocked.h = tile.visualSize;
-            tile.quadLocked.x = world.first;
-            tile.quadLocked.y = world.second;
-        }
-    }
-
 }
 
 void Render::render(float delta, Game& game) {
     timer += delta;
-
-    // Update tile visuals
-    for (int x = 0; x < Game::BOARD_DIM; x++) {
-        for (int y = 0; y < Game::BOARD_DIM; y++) {
-            Tile& tile = game.tiles[x][y];
-            stepTowards(tile.visualSize, delta * 200.0f, Tile::SIZE);
-
-            Coordf world = Game::getWorld(x, y);
-            tile.quad.w = tile.visualSize;
-            tile.quad.h = tile.visualSize;
-            tile.quad.x = world.first + (Tile::SIZE / 2.0f) - (tile.visualSize / 2.0f);
-            tile.quad.y = world.second + (Tile::SIZE / 2.0f) - (tile.visualSize / 2.0f);
-        }
-    }
 
     // Capture fire elements
     quadScreen.setUVs((timer / 40.0f), (timer / 20.0f), (timer / 40.0f) + 1.0f, (timer / 20.0f) + 0.4f);
@@ -113,29 +87,36 @@ void Render::render(float delta, Game& game) {
     // Display all background elements
     painter::draw(quadScreen, fboRefractedContent, shaderDefault, WHITE);
 
-    // Display tiles (separated to draw larger tiles on top)
+    // Display tiles
     for (int x = 0; x < Game::BOARD_DIM; x++) {
         for (int y = 0; y < Game::BOARD_DIM; y++) {
-            if (game.tiles[x][y].visualSize <= Tile::SIZE) {
-                currentTileQuad = &game.tiles[x][y].quad;
-                painter::draw(game.tiles[x][y].quad, textureTileMask, shaderRefract, WHITE);
-            }
-        }
-    }
-    for (int x = 0; x < Game::BOARD_DIM; x++) {
-        for (int y = 0; y < Game::BOARD_DIM; y++) {
-            if (game.tiles[x][y].visualSize > Tile::SIZE) {
-                currentTileQuad = &game.tiles[x][y].quad;
-                painter::draw(game.tiles[x][y].quad, textureTileMask, shaderRefract, WHITE);
-            }
+            currentTileQuad = &game.tiles[x][y].quad;
+            painter::draw(game.tiles[x][y].quad, textureTileMask, shaderRefract, WHITE);
         }
     }
 
-    glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-    painter::draw(game.quadCursor, textureUiTileSwap, shaderDefault, WHITE);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    painter::draw(game.quadCursor, textureUiTileLit, shaderDefault, WHITE);
-
+    for (Group& group : game.groups) render(group);
 }
 
-Render::~Render() {}
+void Render::render(Group& group) {
+    for (int x = 0; x < Group::DIM; x++) {
+        for (int y = 0; y < Group::DIM; y++) {
+            Tile* const tile = group.tiles[y * Group::DIM + x];
+
+            if (tile) {
+                tile->quad.x = group.location.first - (static_cast<float>(Group::DIM) * Tile::SIZE / 2.0f) +
+                        static_cast<float>(x) * Tile::SIZE;
+                tile->quad.y = group.location.second - (static_cast<float>(Group::DIM) * Tile::SIZE / 2.0f) +
+                               static_cast<float>(y) * Tile::SIZE;
+
+                glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+                painter::draw(tile->quad, textureUiTileSwap, shaderDefault, WHITE);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                painter::draw(tile->quad, textureUiTileLit, shaderDefault, WHITE);
+
+                //currentTileQuad = &tile->quad;
+                //painter::draw(tile->quad, textureTileMask, shaderRefract, WHITE);
+            }
+        }
+    }
+}

@@ -1,6 +1,8 @@
 target_sources(${PROJECT_NAME} PRIVATE
         game/game.h
         game/game.cpp
+        game/group.h
+        game/group.cpp
         game/render.h
         game/render.cpp
         game/tile.h
