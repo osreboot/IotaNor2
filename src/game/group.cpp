@@ -3,6 +3,15 @@
 
 #include "game/group.h"
 
+const Coordi SHAPES[] = {
+        {0, 6},
+        {1, 6},
+        {2, 6},
+        {0, 7},
+        {1, 7},
+        {3, 7},
+};
+
 void Group::calculatePadding() {
     int xMin = DIM;
     int yMin = DIM;
@@ -25,9 +34,14 @@ void Group::calculatePadding() {
 }
 
 Group::Group() : tiles() {
-    tiles[0] = new Tile();
+    // Create random shape
+    Coordi tilesShape = SHAPES[rand() % (sizeof(SHAPES) / sizeof(Coordi))];
     tiles[4] = new Tile();
-    tiles[7] = new Tile();
+    tiles[tilesShape.first] = new Tile();
+    tiles[tilesShape.second] = new Tile();
+
+    // Rotate randomly
+    for (int i = 0; i < rand() % 3; i++) rotateCW();
 
     calculatePadding();
 }

@@ -32,7 +32,6 @@ Coordi Game::getTile(Coordf world) {
 }
 
 Game::Game() : quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f) {
-
     // Initialize board
     for (int x = 0; x < BOARD_DIM; x++) {
         for (int y = 0; y < BOARD_DIM; y++) {
@@ -43,8 +42,14 @@ Game::Game() : quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f) {
     }
 
     // Initialize group queue
-    for (int i = 0; i < GROUP_QUEUE_SIZE; i++) groups.emplace_back();
+    for (int i = 0; i < GROUP_QUEUE_SIZE; i++) groups.push_back(new Group());
 
+    groupHold = nullptr;
+}
+
+Game::~Game() {
+    for (Group* group : groups) delete group;
+    delete groupHold;
 }
 
 void Game::update(float delta) {
@@ -52,35 +57,56 @@ void Game::update(float delta) {
     quadDebugCursor.x = locationCursor.first - 192.0f;
     quadDebugCursor.y = locationCursor.second - 192.0f;
 
-    Group& group = groups.front();
+    Group* group = groups.front();
 
     // Handle group rotations
     if (display::hasEventKeyPress(GLFW_KEY_A)) {
-        group.rotateCCW();
+        group->rotateCCW();
     } else if (display::hasEventKeyPress(GLFW_KEY_D)) {
-        group.rotateCW();
+        group->rotateCW();
     }
 
-    // Clamp group position
+    // Clamp group position to board
     Coordi tileCursor = getTile(locationCursor);
-    tileCursor.first = std::clamp(static_cast<int>(tileCursor.first), group.padL, BOARD_DIM - 1 - group.padR);
-    tileCursor.second = std::clamp(static_cast<int>(tileCursor.second), group.padU, BOARD_DIM - 1 - group.padD);
-    group.location = getWorld(tileCursor);
-    group.location.first += Tile::SIZE / 2.0f;
-    group.location.second += Tile::SIZE / 2.0f;
+    tileCursor.first = std::clamp(static_cast<int>(tileCursor.first), group->padL, BOARD_DIM - 1 - group->padR);
+    tileCursor.second = std::clamp(static_cast<int>(tileCursor.second), group->padU, BOARD_DIM - 1 - group->padD);
+    group->location = getWorld(tileCursor);
+    group->location.first += Tile::SIZE / 2.0f;
+    group->location.second += Tile::SIZE / 2.0f;
 
-    // Handle group placing
-    if (display::hasEventMouseRelease()) {
+    // Handle group holding/placing
+    if (display::hasEventKeyPress(GLFW_KEY_SPACE)) {
+        Group* groupTemp = groupHold;
+        groupHold = groups.front();
+        if (groupTemp) {
+            groups.front() = groupTemp;
+        } else {
+            groups.pop_front();
+            groups.push_back(new Group());
+        }
+    } else if (display::hasEventMouseRelease()) {
         for (int x = 0; x < Group::DIM; x++) {
             for (int y = 0; y < Group::DIM; y++) {
-                if (group.tiles[y * Group::DIM + x]) {
+                if (group->tiles[y * Group::DIM + x]) {
                     Tile& tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y - (Group::DIM / 2)];
                     tile.illuminated = !tile.illuminated;
                 }
             }
         }
 
+        delete group;
+
         groups.pop_front();
-        groups.emplace_back();
+        groups.push_back(new Group());
+    }
+
+    for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
+        groups[i]->location = getWorld({(-4 * i) + 2, BOARD_DIM / 2});
+        groups[i]->location.second += Tile::SIZE / 2.0f;
+    }
+
+    if (groupHold) {
+        groupHold->location = getWorld({BOARD_DIM + 2, BOARD_DIM / 2});
+        groupHold->location.second += Tile::SIZE / 2.0f;
     }
 }

@@ -21,9 +21,11 @@ public:
 
     Tile tiles[BOARD_DIM][BOARD_DIM];
 
-    std::deque<Group> groups;
+    std::deque<Group*> groups;
+    Group* groupHold;
 
     Game();
+    ~Game();
 
     void update(float delta);
 

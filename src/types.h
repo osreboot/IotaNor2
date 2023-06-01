@@ -6,4 +6,4 @@
 
 typedef std::pair<GLsizei, GLsizei> Coordw;
 typedef std::pair<GLfloat, GLfloat> Coordf;
-typedef std::pair<GLuint, GLuint> Coordi;
+typedef std::pair<GLint, GLint> Coordi;

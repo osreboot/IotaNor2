@@ -95,7 +95,9 @@ void Render::render(float delta, Game& game) {
         }
     }
 
-    for (Group& group : game.groups) render(group);
+    // Display upcoming pieces
+    for (Group* group : game.groups) render(*group);
+    if (game.groupHold) render(*game.groupHold);
 }
 
 void Render::render(Group& group) {
