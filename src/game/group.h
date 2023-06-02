@@ -5,6 +5,8 @@
 class Group {
 
 private:
+    int rotation;
+
     void calculatePadding();
 
 public:
@@ -20,5 +22,7 @@ public:
 
     void rotateCW();
     void rotateCCW();
+
+    void rotationReset();
 
 };

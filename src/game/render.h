@@ -13,12 +13,15 @@ private:
     TextureFBO fboGameContent, fboRefractedContent;
 
     Texture textureTest, textureNoise;
-    Texture textureUiTileLit, textureUiTileSwap;
+    Texture textureUiTileLit, textureUiTileSwap, textureUiCircle;
     Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
 
-    Quad quadScreen;
+    Quad quadScreen, quadUiStageS, quadUiStageL;
+    Quad quadTileInfection;
 
     float timer = 0.0f;
+
+    float visFireIntensity;
 
     const Quad* currentTileQuad = nullptr;
 

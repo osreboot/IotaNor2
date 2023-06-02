@@ -5,11 +5,13 @@
 class Tile {
 
 private:
+    bool illuminated;
 
 public:
     static const float SIZE;
+    static const float INFECTION_DISABLED;
 
-    bool illuminated;
+    float visTimerLastUpdate, visTimerShock, timerInfect;
 
     Quad quad;
 
@@ -17,5 +19,10 @@ public:
     Tile& operator=(Tile const&) = delete;
 
     Tile();
+
+    void setIlluminated(bool illuminatedArg);
+    bool isIlluminated() const { return illuminated; }
+
+    void flipIlluminated() { setIlluminated(!illuminated); }
 
 };

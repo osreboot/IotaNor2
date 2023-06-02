@@ -1,4 +1,5 @@
 
+#include <cfloat>
 #include <cmath>
 #include <functional>
 
@@ -31,7 +32,9 @@ Coordi Game::getTile(Coordf world) {
             static_cast<int>(floor(map(world.second, worldTileMinY, worldTileMaxY, 0, BOARD_DIM)))};
 }
 
-Game::Game() : quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f) {
+Game::Game() : quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f),
+               stage(0),
+               timerInfect(getStageInfectFreq()) {
     // Initialize board
     for (int x = 0; x < BOARD_DIM; x++) {
         for (int y = 0; y < BOARD_DIM; y++) {
@@ -74,22 +77,23 @@ void Game::update(float delta) {
     group->location.first += Tile::SIZE / 2.0f;
     group->location.second += Tile::SIZE / 2.0f;
 
-    // Handle group holding/placing
+    // Handle group holding
     if (display::hasEventKeyPress(GLFW_KEY_SPACE)) {
         Group* groupTemp = groupHold;
         groupHold = groups.front();
+        groupHold->rotationReset();
         if (groupTemp) {
             groups.front() = groupTemp;
         } else {
             groups.pop_front();
             groups.push_back(new Group());
         }
-    } else if (display::hasEventMouseRelease()) {
+    } else if (display::hasEventMouseRelease()) { // Handle group placing
         for (int x = 0; x < Group::DIM; x++) {
             for (int y = 0; y < Group::DIM; y++) {
                 if (group->tiles[y * Group::DIM + x]) {
                     Tile& tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y - (Group::DIM / 2)];
-                    tile.illuminated = !tile.illuminated;
+                    tile.flipIlluminated();
                 }
             }
         }
@@ -98,6 +102,87 @@ void Game::update(float delta) {
 
         groups.pop_front();
         groups.push_back(new Group());
+    }
+
+    // Handle board infection spreading
+    stepTowards(timerInfect, delta, 0.0f);
+    if (timerInfect <= 0.0f) {
+        timerInfect = getStageInfectFreq();
+
+        int numInfectable = 0;
+        for (int x = 0; x < BOARD_DIM; x++) {
+            for (int y = 0; y < BOARD_DIM; y++) {
+                if (isInfectable(x, y)) numInfectable++;
+            }
+        }
+
+        int numToInfect = getStageInfectBatch();
+        while (numInfectable > 0 && numToInfect > 0) {
+            int indexInfected = rand() % numInfectable;
+            int indexReal = 0;
+            for (int i = 0; i < numInfectable; i++) {
+                while (!isInfectable(indexReal % BOARD_DIM, indexReal / BOARD_DIM)) indexReal++;
+                if (indexInfected == i) {
+                    tiles[indexReal % BOARD_DIM][indexReal / BOARD_DIM].timerInfect = getStageInfectTime();
+                    break;
+                }
+            }
+
+            numInfectable--;
+            numToInfect--;
+        }
+    }
+
+    // Handle individual tile infections
+    for (int x = 0; x < BOARD_DIM; x++) {
+        for (int y = 0; y < BOARD_DIM; y++) {
+            Tile& tile = tiles[x][y];
+            if (tile.timerInfect != Tile::INFECTION_DISABLED) {
+                stepTowards(tile.timerInfect, delta, 0.0f);
+                if (tile.timerInfect == 0.0f) {
+                    tile.timerInfect = Tile::INFECTION_DISABLED;
+                    tile.flipIlluminated();
+                }
+            }
+        }
+    }
+
+    // Handle stage progression
+    bool stageComplete = true;
+    for (int x = 0; x < BOARD_DIM; x++) {
+        for (int y = 0; y < BOARD_DIM; y++) {
+            if (tiles[x][y].isIlluminated() != getStageGoal()) {
+                stageComplete = false;
+                break;
+            }
+        }
+        if (!stageComplete) break;
+    }
+    if (stageComplete) { // Advance stage
+        stage++;
+        timerInfect = getStageInfectFreq();
+
+        // Locate the most recently updated tile (for stage clear ripple animation)
+        Coordi tileLastUpdate = {0, 0};
+        float deltaLastUpdate = FLT_MAX;
+        for (int x = 0; x < BOARD_DIM; x++) {
+            for (int y = 0; y < BOARD_DIM; y++) {
+                if (tiles[x][y].visTimerLastUpdate < deltaLastUpdate) {
+                    deltaLastUpdate = tiles[x][y].visTimerLastUpdate;
+                    tileLastUpdate.first = x;
+                    tileLastUpdate.second = y;
+                }
+            }
+        }
+
+        for (int x = 0; x < BOARD_DIM; x++) {
+            for (int y = 0; y < BOARD_DIM; y++) {
+                Tile& tile = tiles[x][y];
+                tile.timerInfect = Tile::INFECTION_DISABLED;
+                tile.visTimerLastUpdate = 0.0f;
+                tile.visTimerShock = 1.0f + distance(x, y, tileLastUpdate.first, tileLastUpdate.second) / 3.0f;
+            }
+        }
     }
 
     for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
@@ -109,4 +194,44 @@ void Game::update(float delta) {
         groupHold->location = getWorld({BOARD_DIM + 2, BOARD_DIM / 2});
         groupHold->location.second += Tile::SIZE / 2.0f;
     }
+}
+
+bool Game::isInfectable(int x, int y) const {
+    bool stageGoal = getStageGoal();
+    if (tiles[x][y].isIlluminated() != stageGoal || tiles[x][y].timerInfect != Tile::INFECTION_DISABLED) return false;
+    if (x - 1 >= 0 && tiles[x - 1][y].isIlluminated() != stageGoal) return true;
+    if (x + 1 <= BOARD_DIM - 1 && tiles[x + 1][y].isIlluminated() != stageGoal) return true;
+    if (y - 1 >= 0 && tiles[x][y - 1].isIlluminated() != stageGoal) return true;
+    if (y + 1 <= BOARD_DIM - 1 && tiles[x][y + 1].isIlluminated() != stageGoal) return true;
+    return false;
+}
+
+bool Game::getStageGoal() const {
+    return !(stage % 2);
+}
+
+float Game::getStageInfectFreq() const {
+    return map(static_cast<float>(stage), 1.0f, STAGES, 16.0f, 4.0f);
+}
+
+float Game::getStageInfectTime() const {
+    static const float stageTimes[] = {
+            FLT_MAX,
+            10.0f,
+            8.0f,
+            6.0f,
+            8.0f,
+            6.0f,
+            4.0f,
+            3.5f,
+            3.0f,
+    };
+    if (stage >= sizeof(stageTimes) / sizeof(float))
+        return stageTimes[(sizeof(stageTimes) / sizeof(float)) - 1];
+    return stageTimes[stage];
+}
+
+int Game::getStageInfectBatch() const {
+    if (stage == 0) return 0;
+    return stage < 4 ? 1 : 2;
 }
