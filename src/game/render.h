@@ -1,23 +1,29 @@
 #pragma once
 
 #include "game/game.h"
+#include "game/progress_bar.h"
 #include "graphics/painter.h"
 #include "graphics/texture_frame_buffer.h"
 
 class Render {
 
 private:
-    Shader shaderDefault, shaderFire, shaderRefract;
+    Shader shaderFire, shaderRefract, shaderMask;
 
     TextureFBO fboFire0, fboFire1;
     TextureFBO fboGameContent, fboRefractedContent;
+    TextureFBO fboMask, fboMaskChannel0, fboMaskChannel1;
 
-    Texture textureTest, textureNoise;
-    Texture textureUiTileLit, textureUiTileSwap, textureUiCircle;
+    Texture textureTest, textureSolid, textureNoise;
+    Texture textureUiTileLit, textureUiTileSwap, textureUiCircle, textureUiQueueBox;
     Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
+    Texture textureBoardMask;
 
-    Quad quadScreen, quadUiStageS, quadUiStageL;
+    Quad quadScreen, quadUiStageS, quadUiStageL, quadUiQueueBox;
     Quad quadTileInfection;
+    Quad quadBoardMask;
+
+    ProgressBar progressBar;
 
     float timer = 0.0f;
 
@@ -25,11 +31,13 @@ private:
 
     const Quad* currentTileQuad = nullptr;
 
-    void render(Group& group);
+    void render(float delta, Group& group, bool channelBoard);
 
 public:
     static const Color WHITE;
     static const Color BLACK;
+
+    Shader shaderDefault;
 
     Render(Render const&) = delete;
     Render& operator=(Render const&) = delete;

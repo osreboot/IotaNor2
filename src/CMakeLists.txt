@@ -3,10 +3,14 @@ target_sources(${PROJECT_NAME} PRIVATE
         game/game.cpp
         game/group.h
         game/group.cpp
+        game/progress_bar.h
+        game/progress_bar.cpp
         game/render.h
         game/render.cpp
         game/tile.h
         game/tile.cpp
+        game/tile_floating.h
+        game/tile_floating.cpp
         graphics/display.h
         graphics/display.cpp
         graphics/painter.h

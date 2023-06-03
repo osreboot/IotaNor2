@@ -43,11 +43,24 @@ Render::Render(Game& game) :
 
             glUniform1f(glGetUniformLocation(idProgram, "intensity"),visFireIntensity);
         }),
+        shaderMask("../res/shader/default.vert", "../res/shader/mask.frag", [&](const GLuint& idProgram){
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, fboMaskChannel0.getId());
+            glUniform1i(glGetUniformLocation(idProgram, "textureChannel0"), 1);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, fboMaskChannel1.getId());
+            glUniform1i(glGetUniformLocation(idProgram, "textureChannel1"), 2);
+        }),
         fboFire0(TextureFBO::build(display::getSize())),
         fboFire1(TextureFBO::build(display::getSize())),
         fboGameContent(TextureFBO::build(display::getSize())),
         fboRefractedContent(TextureFBO::build(display::getSize())),
+        fboMask(TextureFBO::build(display::getSize())),
+        fboMaskChannel0(TextureFBO::build(display::getSize())),
+        fboMaskChannel1(TextureFBO::build(display::getSize())),
         textureTest(Texture::load("../res/texture/ui/test.png")),
+        textureSolid(Texture::load("../res/texture/ui/solid.png")),
         textureNoise(Texture::load("../res/texture/ui/noise.png")),
         textureTileMask(Texture::load("../res/texture/material/tile_mask.png")),
         textureTileRefC(Texture::load("../res/texture/material/tile_ref_4c.png")),
@@ -56,13 +69,16 @@ Render::Render(Game& game) :
         textureUiTileLit(Texture::load("../res/texture/ui/tile_highlighted.png")),
         textureUiTileSwap(Texture::load("../res/texture/ui/tile_swap.png")),
         textureUiCircle(Texture::load("../res/texture/ui/circle.png")),
+        textureUiQueueBox(Texture::load("../res/texture/ui/queue_outline.png")),
+        textureBoardMask(Texture::load("../res/texture/ui/board_mask.png")),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)),
         quadUiStageS(0.0f, 0.0f, 4.0f, 4.0f),
         quadUiStageL(0.0f, 0.0f, 8.0f, 8.0f),
+        quadUiQueueBox(0.0f, 0.0f, Tile::SIZE * 4.0f, Tile::SIZE * 4.0f),
         quadTileInfection(0.0f, 0.0f, 0.0f, 0.0f),
-        visFireIntensity(0.0f) {
-
-}
+        quadBoardMask(0.0f, 0.0f, 0.0f, 0.0f),
+        progressBar(),
+        visFireIntensity(0.0f) {}
 
 void Render::render(float delta, Game& game) {
     timer += delta;
@@ -85,7 +101,7 @@ void Render::render(float delta, Game& game) {
     }
 
     // Capture fire elements
-    stepTowards(visFireIntensity, delta / 5.0f, static_cast<float>(game.stage) / static_cast<float>(Game::STAGES - 1));
+    stepTowards(visFireIntensity, delta / 3.0f, static_cast<float>(game.stage) / static_cast<float>(Game::STAGES - 1));
     quadScreen.setUVs((timer / 32.0f), (timer / 16.0f), (timer / 32.0f) + 1.0f, (timer / 16.0f) + 0.4f);
     fboFire0.capture(true, [&](){
         painter::draw(quadScreen, textureNoise, shaderDefault, WHITE);
@@ -117,6 +133,17 @@ void Render::render(float delta, Game& game) {
             }
         }
 
+        // Queue and hold box outlines
+        quadUiQueueBox.x = Game::getOriginQueue(0).first - (quadUiQueueBox.w / 2.0f);
+        quadUiQueueBox.y = Game::getOriginQueue(0).second + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
+        painter::draw(quadUiQueueBox, textureUiQueueBox, shaderDefault, WHITE);
+        quadUiQueueBox.x = Game::getOriginHold().first - (quadUiQueueBox.w / 2.0f);
+        quadUiQueueBox.y = Game::getOriginHold().second + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
+        painter::draw(quadUiQueueBox, textureUiQueueBox, shaderDefault, WHITE);
+
+        // Progress bar
+        progressBar.render(delta, *this, game);
+
         // Stage pips
         for (int i = 0; i < Game::STAGES - 1; i++) {
             quadUiStageL.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageL.w / 2.0f) -
@@ -142,34 +169,62 @@ void Render::render(float delta, Game& game) {
     // Display tiles
     for (int x = 0; x < Game::BOARD_DIM; x++) {
         for (int y = 0; y < Game::BOARD_DIM; y++) {
-            currentTileQuad = &game.tiles[x][y].quad;
-            painter::draw(game.tiles[x][y].quad, textureTileMask, shaderRefract, WHITE);
+            Tile& tile = game.tiles[x][y];
+            currentTileQuad = &tile.quad;
+            painter::draw(tile.quad, textureTileMask, shaderRefract, WHITE);
+
+            const float glintIntensity = 1.0f - 4.0f * powf(std::clamp(tile.visTimerShock, 0.0f, 1.0f) - 0.5f, 2.0f);
+            if (glintIntensity > 0.0f)
+                painter::draw(tile.quad, textureUiTileLit, shaderDefault, {1.0f, 1.0f, 1.0f, glintIntensity});
         }
     }
 
-    // Display upcoming pieces
-    for (Group* group : game.groups) render(*group);
-    if (game.groupHold) render(*game.groupHold);
+    // Capture floating piece groups (glass tiles and swap icons)
+    quadBoardMask.w = Game::BOARD_DIM * Tile::SIZE * (2048.0f / (2048.0f - 128.0f));
+    quadBoardMask.h = Game::BOARD_DIM * Tile::SIZE * (2048.0f / (2048.0f - 128.0f));
+    quadBoardMask.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadBoardMask.w / 2.0f);
+    quadBoardMask.y = (static_cast<float>(display::getSize().second) / 2.0f) - (quadBoardMask.h / 2.0f);
+    fboMask.capture(true, [&](){
+        painter::draw(quadBoardMask, textureBoardMask, shaderDefault, WHITE);
+    });
+
+    fboMaskChannel0.capture(true, [&](){
+        for (Group* group : game.groups) render(delta, *group, false);
+        if (game.groupHold) render(delta, *game.groupHold, false);
+    });
+    fboMaskChannel1.capture(true, [&](){});
+    painter::draw(quadScreen, fboMask, shaderMask, WHITE);
+
+    fboMaskChannel0.capture(true, [&](){});
+    fboMaskChannel1.capture(true, [&](){
+        for (Group* group : game.groups) render(delta, *group, true);
+        if (game.groupHold) render(delta, *game.groupHold, true);
+    });
+    glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
+    painter::draw(quadScreen, fboMask, shaderMask, WHITE);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 }
 
-void Render::render(Group& group) {
+void Render::render(float delta, Group& group, bool channelBoard) {
     for (int x = 0; x < Group::DIM; x++) {
         for (int y = 0; y < Group::DIM; y++) {
-            Tile* const tile = group.tiles[y * Group::DIM + x];
+            TileFloating* const tile = group.tiles[y * Group::DIM + x];
 
             if (tile) {
-                tile->quad.x = group.location.first - (static_cast<float>(Group::DIM) * Tile::SIZE / 2.0f) +
-                        static_cast<float>(x) * Tile::SIZE;
-                tile->quad.y = group.location.second - (static_cast<float>(Group::DIM) * Tile::SIZE / 2.0f) +
-                               static_cast<float>(y) * Tile::SIZE;
+                tile->update(delta, group.location, {x, y});
 
-                glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
-                painter::draw(tile->quad, textureUiTileSwap, shaderDefault, WHITE);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                //painter::draw(tile->quad, textureUiTileLit, shaderDefault, WHITE);
+                Coordf tileVisLocation = tile->getVisLocation(group.location, {x, y});
+                tile->quad.x = tileVisLocation.first;
+                tile->quad.y = tileVisLocation.second;
 
-                //currentTileQuad = &tile->quad;
-                //painter::draw(tile->quad, textureTileMask, shaderRefract, WHITE);
+                if (channelBoard) {
+                    painter::draw(tile->quad, textureUiTileSwap, shaderDefault, WHITE);
+                } else {
+                    currentTileQuad = &tile->quad;
+                    painter::draw(tile->quad, textureTileMask, shaderRefract, WHITE);
+                    //painter::draw(tile->quad, textureUiTileLit, shaderDefault, WHITE);
+                }
             }
         }
     }

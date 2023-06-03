@@ -21,7 +21,7 @@ Texture::Texture(Coordw size, const void* pixels, bool vFlip, bool mipmap) : vFl
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.first, size.second, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
     if (mipmap) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

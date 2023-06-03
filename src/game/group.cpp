@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include "game/group.h"
+#include "game/tile_floating.h"
 
 static const Coordi SHAPES[] = {
         {0, 5}, // j
@@ -49,9 +50,9 @@ void Group::calculatePadding() {
 Group::Group() : rotation(0), tiles() {
     // Create random shape
     Coordi tilesShape = SHAPES[rand() % (sizeof(SHAPES) / sizeof(Coordi))];
-    tiles[4] = new Tile();
-    tiles[tilesShape.first] = new Tile();
-    tiles[tilesShape.second] = new Tile();
+    tiles[4] = new TileFloating();
+    tiles[tilesShape.first] = new TileFloating();
+    tiles[tilesShape.second] = new TileFloating();
 
     calculatePadding();
 }
@@ -63,13 +64,13 @@ Group::~Group() {
 void Group::rotateCW() {
     rotation = (rotation + 1) % 4;
 
-    Tile* tempDiag = tiles[0];
+    TileFloating* tempDiag = tiles[0];
     tiles[0] = tiles[6];
     tiles[6] = tiles[8];
     tiles[8] = tiles[2];
     tiles[2] = tempDiag;
 
-    Tile* tempAdj = tiles[1];
+    TileFloating* tempAdj = tiles[1];
     tiles[1] = tiles[3];
     tiles[3] = tiles[7];
     tiles[7] = tiles[5];
@@ -81,13 +82,13 @@ void Group::rotateCW() {
 void Group::rotateCCW() {
     rotation = (rotation + 3) % 4;
 
-    Tile* tempDiag = tiles[0];
+    TileFloating* tempDiag = tiles[0];
     tiles[0] = tiles[2];
     tiles[2] = tiles[8];
     tiles[8] = tiles[6];
     tiles[6] = tempDiag;
 
-    Tile* tempAdj = tiles[1];
+    TileFloating* tempAdj = tiles[1];
     tiles[1] = tiles[5];
     tiles[5] = tiles[7];
     tiles[7] = tiles[3];

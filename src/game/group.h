@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/tile.h"
+#include "game/tile_floating.h"
 
 class Group {
 
@@ -12,7 +13,7 @@ private:
 public:
     static const int DIM = 3;
 
-    Tile* tiles[DIM * DIM];
+    TileFloating* tiles[DIM * DIM];
     Coordf location;
 
     int padL, padU, padR, padD;

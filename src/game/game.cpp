@@ -32,17 +32,17 @@ Coordi Game::getTile(Coordf world) {
             static_cast<int>(floor(map(world.second, worldTileMinY, worldTileMaxY, 0, BOARD_DIM)))};
 }
 
+Coordf Game::getOriginQueue(int index) {
+    return getWorld({(-4 * (index + 1)) + 2, BOARD_DIM / 2});
+}
+
+Coordf Game::getOriginHold() {
+    return getWorld({BOARD_DIM + 2, BOARD_DIM / 2});
+}
+
 Game::Game() : quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f),
                stage(0),
                timerInfect(getStageInfectFreq()) {
-    // Initialize board
-    for (int x = 0; x < BOARD_DIM; x++) {
-        for (int y = 0; y < BOARD_DIM; y++) {
-            Coordf world = getWorld({x, y});
-            tiles[x][y].quad.x = world.first;
-            tiles[x][y].quad.y = world.second;
-        }
-    }
 
     // Initialize group queue
     for (int i = 0; i < GROUP_QUEUE_SIZE; i++) groups.push_back(new Group());
@@ -94,6 +94,7 @@ void Game::update(float delta) {
                 if (group->tiles[y * Group::DIM + x]) {
                     Tile& tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y - (Group::DIM / 2)];
                     tile.flipIlluminated();
+                    //tile.setIlluminated(getStageGoal());
                 }
             }
         }
@@ -109,6 +110,7 @@ void Game::update(float delta) {
     if (timerInfect <= 0.0f) {
         timerInfect = getStageInfectFreq();
 
+        // Count how many tiles are eligible for infection
         int numInfectable = 0;
         for (int x = 0; x < BOARD_DIM; x++) {
             for (int y = 0; y < BOARD_DIM; y++) {
@@ -116,12 +118,14 @@ void Game::update(float delta) {
             }
         }
 
+        // Infect eligible tiles
         int numToInfect = getStageInfectBatch();
         while (numInfectable > 0 && numToInfect > 0) {
             int indexInfected = rand() % numInfectable;
-            int indexReal = 0;
+            int indexReal = -1;
             for (int i = 0; i < numInfectable; i++) {
-                while (!isInfectable(indexReal % BOARD_DIM, indexReal / BOARD_DIM)) indexReal++;
+                do indexReal++;
+                while (!isInfectable(indexReal % BOARD_DIM, indexReal / BOARD_DIM));
                 if (indexInfected == i) {
                     tiles[indexReal % BOARD_DIM][indexReal / BOARD_DIM].timerInfect = getStageInfectTime();
                     break;
@@ -160,6 +164,12 @@ void Game::update(float delta) {
     }
     if (stageComplete) { // Advance stage
         stage++;
+        if (stage == STAGES) { // Game is finished!
+            stage = 0;
+            delete groupHold;
+            groupHold = nullptr;
+        }
+
         timerInfect = getStageInfectFreq();
 
         // Locate the most recently updated tile (for stage clear ripple animation)
@@ -175,6 +185,7 @@ void Game::update(float delta) {
             }
         }
 
+        // Display ripple animation and clear infections
         for (int x = 0; x < BOARD_DIM; x++) {
             for (int y = 0; y < BOARD_DIM; y++) {
                 Tile& tile = tiles[x][y];
@@ -186,12 +197,12 @@ void Game::update(float delta) {
     }
 
     for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
-        groups[i]->location = getWorld({(-4 * i) + 2, BOARD_DIM / 2});
+        groups[i]->location = getOriginQueue(i - 1);
         groups[i]->location.second += Tile::SIZE / 2.0f;
     }
 
     if (groupHold) {
-        groupHold->location = getWorld({BOARD_DIM + 2, BOARD_DIM / 2});
+        groupHold->location = getOriginHold();
         groupHold->location.second += Tile::SIZE / 2.0f;
     }
 }
@@ -219,7 +230,6 @@ float Game::getStageInfectTime() const {
             FLT_MAX,
             10.0f,
             8.0f,
-            6.0f,
             8.0f,
             6.0f,
             4.0f,
@@ -233,5 +243,5 @@ float Game::getStageInfectTime() const {
 
 int Game::getStageInfectBatch() const {
     if (stage == 0) return 0;
-    return stage < 4 ? 1 : 2;
+    return stage < 3 ? 1 : 2;
 }

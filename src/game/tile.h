@@ -11,6 +11,8 @@ public:
     static const float SIZE;
     static const float INFECTION_DISABLED;
 
+    static Coordf getGroupLocation(const Coordf& locationGroup, const Coordi& indexGroup);
+
     float visTimerLastUpdate, visTimerShock, timerInfect;
 
     Quad quad;
@@ -24,5 +26,7 @@ public:
     bool isIlluminated() const { return illuminated; }
 
     void flipIlluminated() { setIlluminated(!illuminated); }
+
+    virtual Coordf getVisLocation(const Coordf& locationGroup, const Coordi& indexGroup);
 
 };

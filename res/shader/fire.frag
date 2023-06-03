@@ -9,10 +9,10 @@ uniform vec4 textureColor;
 uniform float intensity;
 
 void main() {
-    float easingMagnitude = pow(intensity, 6.0) * (10.0 - 0.5) + 0.5;
+    float easingMagnitude = pow(intensity, 3.0) * (10.0 - 0.5) + 0.5;
 
     vec4 colorBase = texture(textureBase, uv);
-    if (colorBase.r < 0.5) {
+    if (colorBase.r == 0.0) {
         // Red (on black) fire rising from floor
         float valueFire = texture(textureFire0, uv).r * texture(textureFire1, uv).r;
         valueFire = 1.0 - pow(1.0 - valueFire, easingMagnitude); // Quadratic easing function for more intense color
