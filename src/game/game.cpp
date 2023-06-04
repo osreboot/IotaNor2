@@ -106,8 +106,8 @@ void Game::update(float delta) {
                     if (group->tiles[y * Group::DIM + x]) {
                         Tile &tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y -
                                                                                     (Group::DIM / 2)];
-                        //tile.flipIlluminated();
-                        tile.setIlluminated(getStageGoal());
+                        tile.flipIlluminated();
+                        //tile.setIlluminated(getStageGoal());
                     }
                 }
             }

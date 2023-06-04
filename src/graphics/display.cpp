@@ -1,10 +1,13 @@
 
 #include <map>
 
+#include "stb/stb_image.h"
+
 #include <GL/glew.h>
 #include <glfw/glfw3.h>
 
 #include "display.h"
+#include "texture.h"
 
 static bool eventMouseRelease;
 static std::map<int, bool> keyStatesLast;
@@ -27,6 +30,11 @@ namespace display {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         window = glfwCreateWindow(windowSize.first, windowSize.second, "Iota Nor - by Calvin Weaver", glfwGetPrimaryMonitor(), nullptr);
         glfwMakeContextCurrent(window);
+
+        GLFWimage images[1];
+        images[0].pixels = stbi_load("../res/texture/ui/icon.png", &images[0].width, &images[0].height, nullptr, 4);
+        glfwSetWindowIcon(window, 1, images);
+        stbi_image_free(images[0].pixels);
 
         glfwSetMouseButtonCallback(window, callbackMouseButton);
 
