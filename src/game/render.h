@@ -1,9 +1,10 @@
 #pragma once
 
-#include "game/game.h"
-#include "game/progress_bar.h"
+#include "game/ui/progress_bar.h"
+#include "graphics/font.h"
 #include "graphics/painter.h"
 #include "graphics/texture_frame_buffer.h"
+#include "game/group.h"
 
 class Render {
 
@@ -24,8 +25,7 @@ private:
     Quad quadBoardMask;
 
     ProgressBar progressBar;
-
-    float timer = 0.0f;
+    Font font;
 
     float visFireIntensity;
 
@@ -37,7 +37,9 @@ public:
     static const Color WHITE;
     static const Color BLACK;
 
-    Shader shaderDefault;
+    float timer = 0.0f;
+
+    Shader shaderDefault, shaderAlpha;
 
     Render(Render const&) = delete;
     Render& operator=(Render const&) = delete;

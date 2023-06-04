@@ -41,11 +41,10 @@ Coordf Game::getOriginHold() {
 }
 
 Game::Game() : quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f),
+               frozen(true),
+               timerFrozenGrace(0.0f),
                stage(0),
                timerInfect(getStageInfectFreq()) {
-
-    // Initialize group queue
-    for (int i = 0; i < GROUP_QUEUE_SIZE; i++) groups.push_back(new Group());
 
     groupHold = nullptr;
 }
@@ -60,151 +59,180 @@ void Game::update(float delta) {
     quadDebugCursor.x = locationCursor.first - 192.0f;
     quadDebugCursor.y = locationCursor.second - 192.0f;
 
-    Group* group = groups.front();
+    if (frozen) {
 
-    // Handle group rotations
-    if (display::hasEventKeyPress(GLFW_KEY_A)) {
-        group->rotateCCW();
-    } else if (display::hasEventKeyPress(GLFW_KEY_D)) {
-        group->rotateCW();
-    }
+        stepTowards(timerFrozenGrace, delta, 0.0f);
+        if (timerFrozenGrace <= 0.0f && display::hasEventMouseRelease()) {
+            frozen = false;
+            stats.onGameStart();
+        }
 
-    // Clamp group position to board
-    Coordi tileCursor = getTile(locationCursor);
-    tileCursor.first = std::clamp(static_cast<int>(tileCursor.first), group->padL, BOARD_DIM - 1 - group->padR);
-    tileCursor.second = std::clamp(static_cast<int>(tileCursor.second), group->padU, BOARD_DIM - 1 - group->padD);
-    group->location = getWorld(tileCursor);
-    group->location.first += Tile::SIZE / 2.0f;
-    group->location.second += Tile::SIZE / 2.0f;
+    } else {
 
-    // Handle group holding
-    if (display::hasEventKeyPress(GLFW_KEY_SPACE)) {
-        Group* groupTemp = groupHold;
-        groupHold = groups.front();
-        groupHold->rotationReset();
-        if (groupTemp) {
-            groups.front() = groupTemp;
-        } else {
+        if (groups.empty()) {
+            for (int i = 0; i < GROUP_QUEUE_SIZE; i++) groups.push_back(new Group());
+        }
+        Group *group = groups.front();
+
+        // Handle group rotations
+        if (display::hasEventKeyPress(GLFW_KEY_A)) {
+            group->rotateCCW();
+        } else if (display::hasEventKeyPress(GLFW_KEY_D)) {
+            group->rotateCW();
+        }
+
+        // Clamp group position to board
+        Coordi tileCursor = getTile(locationCursor);
+        tileCursor.first = std::clamp(static_cast<int>(tileCursor.first), group->padL, BOARD_DIM - 1 - group->padR);
+        tileCursor.second = std::clamp(static_cast<int>(tileCursor.second), group->padU, BOARD_DIM - 1 - group->padD);
+        group->location = getWorld(tileCursor);
+        group->location.first += Tile::SIZE / 2.0f;
+        group->location.second += Tile::SIZE / 2.0f;
+
+        // Handle group holding
+        if (display::hasEventKeyPress(GLFW_KEY_SPACE)) {
+            Group *groupTemp = groupHold;
+            groupHold = groups.front();
+            groupHold->rotationReset();
+            if (groupTemp) {
+                groups.front() = groupTemp;
+            } else {
+                groups.pop_front();
+                groups.push_back(new Group());
+            }
+        } else if (display::hasEventMouseRelease()) { // Handle group placing
+            for (int x = 0; x < Group::DIM; x++) {
+                for (int y = 0; y < Group::DIM; y++) {
+                    if (group->tiles[y * Group::DIM + x]) {
+                        Tile &tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y -
+                                                                                    (Group::DIM / 2)];
+                        //tile.flipIlluminated();
+                        tile.setIlluminated(getStageGoal());
+                    }
+                }
+            }
+
+            delete group;
+
             groups.pop_front();
             groups.push_back(new Group());
+
+            stats.onPiecePlace();
         }
-    } else if (display::hasEventMouseRelease()) { // Handle group placing
-        for (int x = 0; x < Group::DIM; x++) {
-            for (int y = 0; y < Group::DIM; y++) {
-                if (group->tiles[y * Group::DIM + x]) {
-                    Tile& tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y - (Group::DIM / 2)];
-                    tile.flipIlluminated();
-                    //tile.setIlluminated(getStageGoal());
+
+        // Handle board infection spreading
+        stepTowards(timerInfect, delta, 0.0f);
+        if (timerInfect <= 0.0f) {
+            timerInfect = getStageInfectFreq();
+
+            // Count how many tiles are eligible for infection
+            int numInfectable = 0;
+            for (int x = 0; x < BOARD_DIM; x++) {
+                for (int y = 0; y < BOARD_DIM; y++) {
+                    if (isInfectable(x, y)) numInfectable++;
+                }
+            }
+
+            // Infect eligible tiles
+            int numToInfect = getStageInfectBatch();
+            while (numInfectable > 0 && numToInfect > 0) {
+                int indexInfected = rand() % numInfectable;
+                int indexReal = -1;
+                for (int i = 0; i < numInfectable; i++) {
+                    do indexReal++;
+                    while (!isInfectable(indexReal % BOARD_DIM, indexReal / BOARD_DIM));
+                    if (indexInfected == i) {
+                        tiles[indexReal % BOARD_DIM][indexReal / BOARD_DIM].timerInfect = getStageInfectTime();
+                        break;
+                    }
+                }
+
+                numInfectable--;
+                numToInfect--;
+            }
+        }
+
+        // Handle individual tile infections
+        for (int x = 0; x < BOARD_DIM; x++) {
+            for (int y = 0; y < BOARD_DIM; y++) {
+                Tile &tile = tiles[x][y];
+                if (tile.timerInfect != Tile::INFECTION_DISABLED) {
+                    stepTowards(tile.timerInfect, delta, 0.0f);
+                    if (tile.timerInfect == 0.0f) {
+                        tile.timerInfect = Tile::INFECTION_DISABLED;
+                        tile.flipIlluminated();
+                    }
                 }
             }
         }
 
-        delete group;
-
-        groups.pop_front();
-        groups.push_back(new Group());
-    }
-
-    // Handle board infection spreading
-    stepTowards(timerInfect, delta, 0.0f);
-    if (timerInfect <= 0.0f) {
-        timerInfect = getStageInfectFreq();
-
-        // Count how many tiles are eligible for infection
-        int numInfectable = 0;
+        // Handle stage progression
+        bool stageComplete = true;
         for (int x = 0; x < BOARD_DIM; x++) {
             for (int y = 0; y < BOARD_DIM; y++) {
-                if (isInfectable(x, y)) numInfectable++;
-            }
-        }
-
-        // Infect eligible tiles
-        int numToInfect = getStageInfectBatch();
-        while (numInfectable > 0 && numToInfect > 0) {
-            int indexInfected = rand() % numInfectable;
-            int indexReal = -1;
-            for (int i = 0; i < numInfectable; i++) {
-                do indexReal++;
-                while (!isInfectable(indexReal % BOARD_DIM, indexReal / BOARD_DIM));
-                if (indexInfected == i) {
-                    tiles[indexReal % BOARD_DIM][indexReal / BOARD_DIM].timerInfect = getStageInfectTime();
+                if (tiles[x][y].isIlluminated() != getStageGoal()) {
+                    stageComplete = false;
                     break;
                 }
             }
-
-            numInfectable--;
-            numToInfect--;
+            if (!stageComplete) break;
         }
-    }
+        if (stageComplete) { // Advance stage
+            stage++;
+            if (stage == STAGES) { // Game is finished!
+                stage = 0;
 
-    // Handle individual tile infections
-    for (int x = 0; x < BOARD_DIM; x++) {
-        for (int y = 0; y < BOARD_DIM; y++) {
-            Tile& tile = tiles[x][y];
-            if (tile.timerInfect != Tile::INFECTION_DISABLED) {
-                stepTowards(tile.timerInfect, delta, 0.0f);
-                if (tile.timerInfect == 0.0f) {
+                for (Group* g : groups) delete g;
+                groups.clear();
+
+                delete groupHold;
+                groupHold = nullptr;
+
+                frozen = true;
+                timerFrozenGrace = 5.0f;
+            }
+
+            timerInfect = getStageInfectFreq();
+
+            stats.onStageAdvance();
+
+            // Locate the most recently updated tile (for stage clear ripple animation)
+            Coordi tileLastUpdate = {0, 0};
+            float deltaLastUpdate = FLT_MAX;
+            for (int x = 0; x < BOARD_DIM; x++) {
+                for (int y = 0; y < BOARD_DIM; y++) {
+                    if (tiles[x][y].visTimerLastUpdate < deltaLastUpdate) {
+                        deltaLastUpdate = tiles[x][y].visTimerLastUpdate;
+                        tileLastUpdate.first = x;
+                        tileLastUpdate.second = y;
+                    }
+                }
+            }
+
+            // Display ripple animation and clear infections
+            for (int x = 0; x < BOARD_DIM; x++) {
+                for (int y = 0; y < BOARD_DIM; y++) {
+                    Tile &tile = tiles[x][y];
                     tile.timerInfect = Tile::INFECTION_DISABLED;
-                    tile.flipIlluminated();
-                }
-            }
-        }
-    }
-
-    // Handle stage progression
-    bool stageComplete = true;
-    for (int x = 0; x < BOARD_DIM; x++) {
-        for (int y = 0; y < BOARD_DIM; y++) {
-            if (tiles[x][y].isIlluminated() != getStageGoal()) {
-                stageComplete = false;
-                break;
-            }
-        }
-        if (!stageComplete) break;
-    }
-    if (stageComplete) { // Advance stage
-        stage++;
-        if (stage == STAGES) { // Game is finished!
-            stage = 0;
-            delete groupHold;
-            groupHold = nullptr;
-        }
-
-        timerInfect = getStageInfectFreq();
-
-        // Locate the most recently updated tile (for stage clear ripple animation)
-        Coordi tileLastUpdate = {0, 0};
-        float deltaLastUpdate = FLT_MAX;
-        for (int x = 0; x < BOARD_DIM; x++) {
-            for (int y = 0; y < BOARD_DIM; y++) {
-                if (tiles[x][y].visTimerLastUpdate < deltaLastUpdate) {
-                    deltaLastUpdate = tiles[x][y].visTimerLastUpdate;
-                    tileLastUpdate.first = x;
-                    tileLastUpdate.second = y;
+                    tile.visTimerLastUpdate = 0.0f;
+                    tile.visTimerShock = 1.0f + distance(x, y, tileLastUpdate.first, tileLastUpdate.second) / 3.0f;
                 }
             }
         }
 
-        // Display ripple animation and clear infections
-        for (int x = 0; x < BOARD_DIM; x++) {
-            for (int y = 0; y < BOARD_DIM; y++) {
-                Tile& tile = tiles[x][y];
-                tile.timerInfect = Tile::INFECTION_DISABLED;
-                tile.visTimerLastUpdate = 0.0f;
-                tile.visTimerShock = 1.0f + distance(x, y, tileLastUpdate.first, tileLastUpdate.second) / 3.0f;
-            }
+        for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
+            groups[i]->location = getOriginQueue(i - 1);
+            groups[i]->location.second += Tile::SIZE / 2.0f;
         }
+
+        if (groupHold) {
+            groupHold->location = getOriginHold();
+            groupHold->location.second += Tile::SIZE / 2.0f;
+        }
+
     }
 
-    for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
-        groups[i]->location = getOriginQueue(i - 1);
-        groups[i]->location.second += Tile::SIZE / 2.0f;
-    }
-
-    if (groupHold) {
-        groupHold->location = getOriginHold();
-        groupHold->location.second += Tile::SIZE / 2.0f;
-    }
+    stats.update(delta, *this);
 }
 
 bool Game::isInfectable(int x, int y) const {

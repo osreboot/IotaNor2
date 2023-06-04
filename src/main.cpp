@@ -1,6 +1,7 @@
 
 #include <chrono>
 
+#include "game/game.h"
 #include "game/render.h"
 #include "graphics/display.h"
 #include "graphics/painter.h"

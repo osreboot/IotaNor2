@@ -14,7 +14,7 @@ public:
     Texture(Texture const&) = delete;
     Texture& operator=(Texture const&) = delete;
 
-    Texture(Coordw size, const void* pixels, bool vFlip, bool mipmap);
+    Texture(Coordw size, GLint internalFormat, GLint format, const void* pixels, bool vFlip, bool mipmap);
     ~Texture();
 
     const GLuint& getId() const { return idTexture; }

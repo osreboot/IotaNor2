@@ -1,7 +1,8 @@
 #pragma once
 
 #include "types.h"
-#include "game/game.h"
+#include "graphics/texture.h"
+#include "graphics/quad.h"
 
 class ProgressBar {
 

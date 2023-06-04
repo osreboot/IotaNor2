@@ -2,6 +2,7 @@
 
 #include <deque>
 
+#include "game/ui/stats.h"
 #include "game/group.h"
 #include "game/tile_floating.h"
 #include "graphics/quad.h"
@@ -29,8 +30,13 @@ public:
     std::deque<Group*> groups;
     Group* groupHold;
 
+    bool frozen;
+    float timerFrozenGrace;
+
     int stage;
     float timerInfect;
+
+    Stats stats;
 
     Game();
     ~Game();

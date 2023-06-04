@@ -1,5 +1,6 @@
 
-#include "game/progress_bar.h"
+#include "game/game.h"
+#include "game/ui/progress_bar.h"
 #include "game/render.h"
 #include "graphics/display.h"
 #include "graphics/painter.h"
@@ -21,7 +22,6 @@ ProgressBar::ProgressBar() :
         visProgress(0.0f) {}
 
 void ProgressBar::render(float delta, const Render& render, const Game &game) {
-
     int numIlluminated = 0;
     for (int x = 0; x < Game::BOARD_DIM; x++) {
         for (int y = 0; y < Game::BOARD_DIM; y++) {
@@ -50,5 +50,4 @@ void ProgressBar::render(float delta, const Render& render, const Game &game) {
 
     painter::draw(quad, textureCutout, render.shaderDefault, Render::WHITE);
     painter::draw(quad, textureEnds, render.shaderDefault, Render::WHITE);
-
 }

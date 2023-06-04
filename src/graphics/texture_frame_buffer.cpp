@@ -11,7 +11,7 @@ TextureFBO TextureFBO::build(Coordw size) {
 }
 
 TextureFBO::TextureFBO(Coordw size, GLuint idFrameBuffer) :
-        Texture(size, 0, true, false), idFrameBuffer(idFrameBuffer) {
+        Texture(size, GL_RGBA8, GL_RGBA, 0, true, false), idFrameBuffer(idFrameBuffer) {
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, getId(), 0);
 
     GLenum drawBuffers[1] = {GL_COLOR_ATTACHMENT0};

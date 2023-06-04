@@ -25,7 +25,7 @@ namespace display {
         glfwInit();
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        window = glfwCreateWindow(windowSize.first, windowSize.second, "", glfwGetPrimaryMonitor(), nullptr);
+        window = glfwCreateWindow(windowSize.first, windowSize.second, "Iota Nor - by Calvin Weaver", glfwGetPrimaryMonitor(), nullptr);
         glfwMakeContextCurrent(window);
 
         glfwSetMouseButtonCallback(window, callbackMouseButton);

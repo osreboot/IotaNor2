@@ -11,14 +11,14 @@ Texture Texture::load(const char *path) {
 
     int w, h;
     unsigned char* image = stbi_load(path, &w, &h, nullptr, 4);
-    return {{w, h}, image, false, true};
+    return {{w, h}, GL_RGBA8, GL_RGBA, image, false, true};
 }
 
-Texture::Texture(Coordw size, const void* pixels, bool vFlip, bool mipmap) : vFlip(vFlip) {
+Texture::Texture(Coordw size, GLint internalFormat, GLint format, const void* pixels, bool vFlip, bool mipmap) : vFlip(vFlip) {
     idTexture = 0; // Silence Clang warnings!
     glGenTextures(1, &idTexture);
     glBindTexture(GL_TEXTURE_2D, idTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, size.first, size.second, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, size.first, size.second, 0, format, GL_UNSIGNED_BYTE, pixels);
 
     if (mipmap) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);

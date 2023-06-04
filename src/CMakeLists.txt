@@ -1,10 +1,12 @@
 target_sources(${PROJECT_NAME} PRIVATE
+        game/ui/progress_bar.h
+        game/ui/progress_bar.cpp
+        game/ui/stats.h
+        game/ui/stats.cpp
         game/game.h
         game/game.cpp
         game/group.h
         game/group.cpp
-        game/progress_bar.h
-        game/progress_bar.cpp
         game/render.h
         game/render.cpp
         game/tile.h
@@ -13,6 +15,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         game/tile_floating.cpp
         graphics/display.h
         graphics/display.cpp
+        graphics/font.h
+        graphics/font.cpp
         graphics/painter.h
         graphics/painter.cpp
         graphics/quad.h
@@ -23,6 +27,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         graphics/texture.cpp
         graphics/texture_frame_buffer.h
         graphics/texture_frame_buffer.cpp
+        graphics/truetype_init.cpp
         main.cpp
         types.h
         util.h

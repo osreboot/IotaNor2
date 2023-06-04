@@ -1,6 +1,6 @@
 
-#include <valarray>
-
+#include <string>
+#include "game/game.h"
 #include "game/render.h"
 #include "graphics/display.h"
 #include "util.h"
@@ -10,6 +10,7 @@ const Color Render::BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
 
 Render::Render(Game& game) :
         shaderDefault("../res/shader/default.vert", "../res/shader/default.frag", [](const GLuint&){}),
+        shaderAlpha("../res/shader/default.vert", "../res/shader/alpha_colorize.frag", [](const GLuint&){}),
         shaderRefract("../res/shader/default.vert", "../res/shader/tile_refract.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboRefractedContent.getId());
@@ -72,11 +73,12 @@ Render::Render(Game& game) :
         textureUiQueueBox(Texture::load("../res/texture/ui/queue_outline.png")),
         textureBoardMask(Texture::load("../res/texture/ui/board_mask.png")),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)),
-        quadUiStageS(0.0f, 0.0f, 4.0f, 4.0f),
+        quadUiStageS(0.0f, 0.0f, 6.0f, 6.0f),
         quadUiStageL(0.0f, 0.0f, 8.0f, 8.0f),
         quadUiQueueBox(0.0f, 0.0f, Tile::SIZE * 4.0f, Tile::SIZE * 4.0f),
         quadTileInfection(0.0f, 0.0f, 0.0f, 0.0f),
         quadBoardMask(0.0f, 0.0f, 0.0f, 0.0f),
+        font(),
         progressBar(),
         visFireIntensity(0.0f) {}
 
@@ -141,20 +143,25 @@ void Render::render(float delta, Game& game) {
         quadUiQueueBox.y = Game::getOriginHold().second + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
         painter::draw(quadUiQueueBox, textureUiQueueBox, shaderDefault, WHITE);
 
-        // Progress bar
-        progressBar.render(delta, *this, game);
+        if (!game.frozen) {
+            // Progress bar
+            progressBar.render(delta, *this, game);
 
-        // Stage pips
-        for (int i = 0; i < Game::STAGES - 1; i++) {
-            quadUiStageL.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageL.w / 2.0f) -
-                    (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
-            quadUiStageL.y = static_cast<float>(display::getSize().second) - 48.0f - (quadUiStageL.h / 2.0f);
-            painter::draw(quadUiStageL, textureUiCircle, shaderDefault, BLACK);
-            quadUiStageS.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageS.w / 2.0f) -
-                             (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
-            quadUiStageS.y = static_cast<float>(display::getSize().second) - 48.0f - (quadUiStageS.h / 2.0f);
-            painter::draw(quadUiStageS, textureUiCircle, shaderDefault, game.stage > i ? WHITE : BLACK);
+            // Stage pips
+            for (int i = 0; i < Game::STAGES - 1; i++) {
+                quadUiStageL.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageL.w / 2.0f) -
+                                 (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
+                quadUiStageL.y = static_cast<float>(display::getSize().second) - 48.0f - (quadUiStageL.h / 2.0f);
+                painter::draw(quadUiStageL, textureUiCircle, shaderDefault, WHITE);
+                quadUiStageS.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageS.w / 2.0f) -
+                                 (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
+                quadUiStageS.y = static_cast<float>(display::getSize().second) - 48.0f - (quadUiStageS.h / 2.0f);
+                if(game.stage <= i) painter::draw(quadUiStageS, textureUiCircle, shaderDefault, BLACK);
+            }
         }
+
+        // Text
+        game.stats.render(*this, game, font);
     });
 
     // Capture all background elements (so they can be processed by the tile refraction shader)
@@ -203,7 +210,6 @@ void Render::render(float delta, Game& game) {
     glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
     painter::draw(quadScreen, fboMask, shaderMask, WHITE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 }
 
 void Render::render(float delta, Group& group, bool channelBoard) {
