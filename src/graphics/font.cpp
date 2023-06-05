@@ -12,7 +12,7 @@ Font::Font() : quad(0.0f, 0.0f, 512.0f, 512.0f){
     unsigned char ttf_buffer[1 << 20];
     unsigned char pixels[512 * 512];
 
-    std::fread(ttf_buffer, 1, 1 << 20, std::fopen("../res/texture/ui/font/Rubik-Light.ttf", "rb"));
+    std::fread(ttf_buffer, 1, 1 << 20, std::fopen("res/texture/ui/font/Rubik-Light.ttf", "rb"));
     stbtt_BakeFontBitmap(ttf_buffer, 0, 24.0, pixels, 512, 512, 32, 96, cdata);
 
     texture = new Texture({512, 512}, GL_RGBA8, GL_ALPHA, pixels, false, false);

@@ -7,11 +7,11 @@
 Audio::Audio() : muted(false) {
     ma_engine_init(nullptr, &engine);
 
-    queuePiecePlace = new AudioQueue(engine, 4, "../res/audio/piece_place.wav");
-    queuePieceRotate = new AudioQueue(engine, 4, "../res/audio/piece_rotate.wav");
-    queuePieceHold = new AudioQueue(engine, 4, "../res/audio/piece_hold.wav");
+    queuePiecePlace = new AudioQueue(engine, 4, "res/audio/piece_place.wav");
+    queuePieceRotate = new AudioQueue(engine, 4, "res/audio/piece_rotate.wav");
+    queuePieceHold = new AudioQueue(engine, 4, "res/audio/piece_hold.wav");
 
-    ma_sound_init_from_file(&engine, "../res/audio/stage_advance.wav", 0, nullptr, nullptr, &soundStageAdvance);
+    ma_sound_init_from_file(&engine, "res/audio/stage_advance.wav", 0, nullptr, nullptr, &soundStageAdvance);
     ma_sound_set_volume(&soundStageAdvance, 0.3f);
 }
 
@@ -47,7 +47,7 @@ void Audio::onPieceInfect() {
 
 void Audio::onPieceRotate() {
     if (!muted) {
-        ma_sound_set_volume(&queuePieceRotate->getCurrent(), 0.3f);
+        ma_sound_set_volume(&queuePieceRotate->getCurrent(), 0.25f);
         applyRandomPitch(queuePieceRotate->getCurrent(), 0.9f, 1.1f);
         ma_sound_start(&queuePieceRotate->getCurrent());
         queuePieceRotate->advance();

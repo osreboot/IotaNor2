@@ -9,9 +9,9 @@ const Color Render::WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
 const Color Render::BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
 
 Render::Render(Game& game) :
-        shaderDefault("../res/shader/default.vert", "../res/shader/default.frag", [](const GLuint&){}),
-        shaderAlpha("../res/shader/default.vert", "../res/shader/alpha_colorize.frag", [](const GLuint&){}),
-        shaderRefract("../res/shader/default.vert", "../res/shader/tile_refract.frag", [&](const GLuint& idProgram){
+        shaderDefault("res/shader/default.vert", "res/shader/default.frag", [](const GLuint&){}),
+        shaderAlpha("res/shader/default.vert", "res/shader/alpha_colorize.frag", [](const GLuint&){}),
+        shaderRefract("res/shader/default.vert", "res/shader/tile_refract.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboRefractedContent.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureBackground"), 1);
@@ -33,7 +33,7 @@ Render::Render(Game& game) :
             glUniform2f(glGetUniformLocation(idProgram, "tileSize"), currentTileQuad->w, currentTileQuad->h);
             glUniform2f(glGetUniformLocation(idProgram, "tileLocation"), currentTileQuad->x, currentTileQuad->y);
         }),
-        shaderFire("../res/shader/default.vert", "../res/shader/fire.frag", [&](const GLuint& idProgram){
+        shaderFire("res/shader/default.vert", "res/shader/fire.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboFire0.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureFire0"), 1);
@@ -44,7 +44,7 @@ Render::Render(Game& game) :
 
             glUniform1f(glGetUniformLocation(idProgram, "intensity"),visFireIntensity);
         }),
-        shaderMask("../res/shader/default.vert", "../res/shader/mask.frag", [&](const GLuint& idProgram){
+        shaderMask("res/shader/default.vert", "res/shader/mask.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboMaskChannel0.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureChannel0"), 1);
@@ -60,20 +60,20 @@ Render::Render(Game& game) :
         fboMask(TextureFBO::build(display::getSize())),
         fboMaskChannel0(TextureFBO::build(display::getSize())),
         fboMaskChannel1(TextureFBO::build(display::getSize())),
-        textureTest(Texture::load("../res/texture/ui/test.png")),
-        textureSolid(Texture::load("../res/texture/ui/solid.png")),
-        textureNoise(Texture::load("../res/texture/ui/noise.png")),
-        textureTileMask(Texture::load("../res/texture/material/tile_mask.png")),
-        textureTileRefC(Texture::load("../res/texture/material/tile_ref_4c.png")),
-        textureTileRefL(Texture::load("../res/texture/material/tile_ref_4l.png")),
-        textureTileRefUL(Texture::load("../res/texture/material/tile_ref_4ul.png")),
-        textureUiTileLit(Texture::load("../res/texture/ui/tile_highlighted.png")),
-        textureUiTileSwap(Texture::load("../res/texture/ui/tile_swap.png")),
-        textureUiTileSwapSmall(Texture::load("../res/texture/ui/tile_swap_small.png")),
-        textureUiCircle(Texture::load("../res/texture/ui/circle.png")),
-        textureUiQueueBox(Texture::load("../res/texture/ui/queue_outline.png")),
-        textureUiAudioMuted(Texture::load("../res/texture/ui/mute.png")),
-        textureBoardMask(Texture::load("../res/texture/ui/board_mask.png")),
+        textureTest(Texture::load("res/texture/ui/test.png")),
+        textureSolid(Texture::load("res/texture/ui/solid.png")),
+        textureNoise(Texture::load("res/texture/ui/noise.png")),
+        textureTileMask(Texture::load("res/texture/material/tile_mask.png")),
+        textureTileRefC(Texture::load("res/texture/material/tile_ref_4c.png")),
+        textureTileRefL(Texture::load("res/texture/material/tile_ref_4l.png")),
+        textureTileRefUL(Texture::load("res/texture/material/tile_ref_4ul.png")),
+        textureUiTileLit(Texture::load("res/texture/ui/tile_highlighted.png")),
+        textureUiTileSwap(Texture::load("res/texture/ui/tile_swap.png")),
+        textureUiTileSwapSmall(Texture::load("res/texture/ui/tile_swap_small.png")),
+        textureUiCircle(Texture::load("res/texture/ui/circle.png")),
+        textureUiQueueBox(Texture::load("res/texture/ui/queue_outline.png")),
+        textureUiAudioMuted(Texture::load("res/texture/ui/mute.png")),
+        textureBoardMask(Texture::load("res/texture/ui/board_mask.png")),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)),
         quadUiStageS(0.0f, 0.0f, 6.0f, 6.0f),
         quadUiStageL(0.0f, 0.0f, 8.0f, 8.0f),

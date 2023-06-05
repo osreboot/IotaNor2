@@ -9,13 +9,13 @@
 const float ProgressBar::W = 256.0f;
 
 ProgressBar::ProgressBar() :
-        textureEnds(Texture::load("../res/texture/ui/progress/progress_ends_c.png")),
-        textureEndsBack(Texture::load("../res/texture/ui/progress/progress_ends_cb.png")),
-        textureCutout(Texture::load("../res/texture/ui/progress/progress_cutout.png")),
-        textureBlackGrow(Texture::load("../res/texture/ui/progress/progress_black_grow.png")),
-        textureWhiteGrow(Texture::load("../res/texture/ui/progress/progress_white_grow.png")),
-        textureBlackShrink(Texture::load("../res/texture/ui/progress/progress_black_shrink.png")),
-        textureWhiteShrink(Texture::load("../res/texture/ui/progress/progress_white_shrink.png")),
+        textureEnds(Texture::load("res/texture/ui/progress/progress_ends_c.png")),
+        textureEndsBack(Texture::load("res/texture/ui/progress/progress_ends_cb.png")),
+        textureCutout(Texture::load("res/texture/ui/progress/progress_cutout.png")),
+        textureBlackGrow(Texture::load("res/texture/ui/progress/progress_black_grow.png")),
+        textureWhiteGrow(Texture::load("res/texture/ui/progress/progress_white_grow.png")),
+        textureBlackShrink(Texture::load("res/texture/ui/progress/progress_black_shrink.png")),
+        textureWhiteShrink(Texture::load("res/texture/ui/progress/progress_white_shrink.png")),
         quad(0.0f, 0.0f, W, W / 16.0f),
         quadBlack(0.0f, 0.0f, W, W / 16.0f),
         quadWhite(0.0f, 0.0f, W, W / 16.0f),
