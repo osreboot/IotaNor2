@@ -3,6 +3,11 @@ target_sources(${PROJECT_NAME} PRIVATE
         game/ui/progress_bar.cpp
         game/ui/stats.h
         game/ui/stats.cpp
+        game/audio/audio.h
+        game/audio/audio.cpp
+        game/audio/audio_queue.h
+        game/audio/audio_queue.cpp
+        game/audio/miniaudio_init.cpp
         game/game.h
         game/game.cpp
         game/group.h

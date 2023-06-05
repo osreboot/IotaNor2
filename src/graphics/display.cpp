@@ -9,10 +9,11 @@
 #include "display.h"
 #include "texture.h"
 
-static bool eventMouseRelease;
+static bool eventMousePress, eventMouseRelease;
 static std::map<int, bool> keyStatesLast;
 
 void callbackMouseButton(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) eventMousePress = true;
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) eventMouseRelease = true;
 }
 
@@ -42,6 +43,7 @@ namespace display {
     }
 
     void preUpdate() {
+        eventMousePress = false;
         eventMouseRelease = false;
 
         glfwPollEvents();
@@ -77,6 +79,10 @@ namespace display {
 
     const Coordf& getCursor() {
         return locationCursor;
+    }
+
+    bool hasEventMousePress() {
+        return eventMousePress;
     }
 
     bool hasEventMouseRelease() {

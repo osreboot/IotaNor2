@@ -44,7 +44,7 @@ void Stats::render(const Render& render, const Game& game, Font& font) {
     if (game.frozen) {
 
         // Display the title cards
-        std::string strTitle = "iota nor";
+        std::string strTitle = "Iota Nor";
         Coordf locationStrTitle = {Game::getOriginQueue(0).first - (font.getSize(strTitle.c_str()).first / 2.0f),
                                    Game::getOriginQueue(0).second + (Tile::SIZE / 2.0f) + 6.0f};
         font.render(render, strTitle.c_str(), locationStrTitle, Render::BLACK);

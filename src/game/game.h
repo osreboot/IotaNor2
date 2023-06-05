@@ -3,6 +3,7 @@
 #include <deque>
 
 #include "game/ui/stats.h"
+#include "game/audio/audio.h"
 #include "game/group.h"
 #include "game/tile_floating.h"
 #include "graphics/quad.h"
@@ -36,6 +37,7 @@ public:
     int stage;
     float timerInfect;
 
+    Audio audio;
     Stats stats;
 
     Game();

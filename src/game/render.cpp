@@ -69,13 +69,16 @@ Render::Render(Game& game) :
         textureTileRefUL(Texture::load("../res/texture/material/tile_ref_4ul.png")),
         textureUiTileLit(Texture::load("../res/texture/ui/tile_highlighted.png")),
         textureUiTileSwap(Texture::load("../res/texture/ui/tile_swap.png")),
+        textureUiTileSwapSmall(Texture::load("../res/texture/ui/tile_swap_small.png")),
         textureUiCircle(Texture::load("../res/texture/ui/circle.png")),
         textureUiQueueBox(Texture::load("../res/texture/ui/queue_outline.png")),
+        textureUiAudioMuted(Texture::load("../res/texture/ui/mute.png")),
         textureBoardMask(Texture::load("../res/texture/ui/board_mask.png")),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)),
         quadUiStageS(0.0f, 0.0f, 6.0f, 6.0f),
         quadUiStageL(0.0f, 0.0f, 8.0f, 8.0f),
         quadUiQueueBox(0.0f, 0.0f, Tile::SIZE * 4.0f, Tile::SIZE * 4.0f),
+        quadUiAudioMuted(0.0f, 0.0f, 64.0f, 64.0f),
         quadTileInfection(0.0f, 0.0f, 0.0f, 0.0f),
         quadBoardMask(0.0f, 0.0f, 0.0f, 0.0f),
         font(),
@@ -162,6 +165,13 @@ void Render::render(float delta, Game& game) {
 
         // Text
         game.stats.render(*this, game, font);
+
+        // Audio muted icon
+        if (game.audio.muted) {
+            quadUiAudioMuted.x = 16.0f;
+            quadUiAudioMuted.y = static_cast<float>(display::getSize().second) - quadUiAudioMuted.h - 16.0f;
+            painter::draw(quadUiAudioMuted, textureUiAudioMuted, shaderDefault, {1.0f, 1.0f, 1.0f, 0.6f});
+        }
     });
 
     // Capture all background elements (so they can be processed by the tile refraction shader)
@@ -225,7 +235,8 @@ void Render::render(float delta, Group& group, bool channelBoard) {
                 tile->quad.y = tileVisLocation.second;
 
                 if (channelBoard) {
-                    painter::draw(tile->quad, textureUiTileSwap, shaderDefault, WHITE);
+                    const bool centerTile = x == Group::DIM / 2 && y == Group::DIM / 2;
+                    painter::draw(tile->quad, centerTile ? textureUiTileSwap : textureUiTileSwapSmall, shaderDefault, WHITE);
                 } else {
                     currentTileQuad = &tile->quad;
                     painter::draw(tile->quad, textureTileMask, shaderRefract, WHITE);

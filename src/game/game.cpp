@@ -59,6 +59,9 @@ void Game::update(float delta) {
     quadDebugCursor.x = locationCursor.first - 192.0f;
     quadDebugCursor.y = locationCursor.second - 192.0f;
 
+    // Handle audio muting
+    if (display::hasEventKeyPress(GLFW_KEY_M)) audio.muted = !audio.muted;
+
     if (frozen) {
 
         stepTowards(timerFrozenGrace, delta, 0.0f);
@@ -77,8 +80,10 @@ void Game::update(float delta) {
         // Handle group rotations
         if (display::hasEventKeyPress(GLFW_KEY_A)) {
             group->rotateCCW();
+            audio.onPieceRotate();
         } else if (display::hasEventKeyPress(GLFW_KEY_D)) {
             group->rotateCW();
+            audio.onPieceRotate();
         }
 
         // Clamp group position to board
@@ -100,7 +105,9 @@ void Game::update(float delta) {
                 groups.pop_front();
                 groups.push_back(new Group());
             }
-        } else if (display::hasEventMouseRelease()) { // Handle group placing
+
+            audio.onPieceHold();
+        } else if (display::hasEventMousePress()) { // Handle group placing
             for (int x = 0; x < Group::DIM; x++) {
                 for (int y = 0; y < Group::DIM; y++) {
                     if (group->tiles[y * Group::DIM + x]) {
@@ -117,6 +124,7 @@ void Game::update(float delta) {
             groups.pop_front();
             groups.push_back(new Group());
 
+            audio.onPiecePlace();
             stats.onPiecePlace();
         }
 
@@ -153,6 +161,7 @@ void Game::update(float delta) {
         }
 
         // Handle individual tile infections
+        bool shouldPlayInfectionAudio = false;
         for (int x = 0; x < BOARD_DIM; x++) {
             for (int y = 0; y < BOARD_DIM; y++) {
                 Tile &tile = tiles[x][y];
@@ -161,6 +170,7 @@ void Game::update(float delta) {
                     if (tile.timerInfect == 0.0f) {
                         tile.timerInfect = Tile::INFECTION_DISABLED;
                         tile.flipIlluminated();
+                        shouldPlayInfectionAudio = true;
                     }
                 }
             }
@@ -194,6 +204,7 @@ void Game::update(float delta) {
 
             timerInfect = getStageInfectFreq();
 
+            audio.onStageAdvance();
             stats.onStageAdvance();
 
             // Locate the most recently updated tile (for stage clear ripple animation)
@@ -218,7 +229,7 @@ void Game::update(float delta) {
                     tile.visTimerShock = 1.0f + distance(x, y, tileLastUpdate.first, tileLastUpdate.second) / 3.0f;
                 }
             }
-        }
+        } else if (shouldPlayInfectionAudio) audio.onPieceInfect();
 
         for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
             groups[i]->location = getOriginQueue(i - 1);
