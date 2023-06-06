@@ -6,20 +6,27 @@
 #include "graphics/quad.h"
 #include "types.h"
 
+// Handles loading and rendering a single .ttf font
 class Font {
 
 private:
-    Texture* texture;
-    stbtt_bakedchar cdata[96];
-    Quad quad;
+    Texture* texture; // The temporary texture created from baking the font vector graphic
+    stbtt_bakedchar ttCharData[96]; // Character data used by stb_truetype
+    Quad quad; // Quad representing a single character (reused many times each render call)
 
 public:
+    // Disable copying
+    Font(Font const&) = delete;
+    Font& operator=(Font const&) = delete;
 
-    Font();
+    // Constructor requires the entire .ttf file path, including extension
+    Font(const char* path);
     ~Font();
 
+    // Returns the pixel size 'str' would be if drawn to the screen
     Coordf getSize(const char* str) const;
 
-    void render(const Render& render, const char* str, Coordf location, Color color);
+    // Renders 'str' to the screen
+    void draw(const Render& render, const char* str, Coordf location, Color color);
 
 };

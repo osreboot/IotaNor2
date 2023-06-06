@@ -1,5 +1,4 @@
 
-#include <string>
 #include "game/game.h"
 #include "game/render.h"
 #include "graphics/display.h"
@@ -64,10 +63,10 @@ Render::Render(Game& game) :
         textureSolid(Texture::load("res/texture/ui/solid.png")),
         textureNoise(Texture::load("res/texture/ui/noise.png")),
         textureTileMask(Texture::load("res/texture/material/tile_mask.png")),
-        textureTileRefC(Texture::load("res/texture/material/tile_ref_4c.png")),
-        textureTileRefL(Texture::load("res/texture/material/tile_ref_4l.png")),
-        textureTileRefUL(Texture::load("res/texture/material/tile_ref_4ul.png")),
-        textureUiTileLit(Texture::load("res/texture/ui/tile_highlighted.png")),
+        textureTileRefC(Texture::load("res/texture/material/tile_ref_c.png")),
+        textureTileRefL(Texture::load("res/texture/material/tile_ref_l.png")),
+        textureTileRefUL(Texture::load("res/texture/material/tile_ref_ul.png")),
+        textureTileLit(Texture::load("res/texture/material/tile_highlighted.png")),
         textureUiTileSwap(Texture::load("res/texture/ui/tile_swap.png")),
         textureUiTileSwapSmall(Texture::load("res/texture/ui/tile_swap_small.png")),
         textureUiCircle(Texture::load("res/texture/ui/circle.png")),
@@ -81,7 +80,7 @@ Render::Render(Game& game) :
         quadUiAudioMuted(0.0f, 0.0f, 64.0f, 64.0f),
         quadTileInfection(0.0f, 0.0f, 0.0f, 0.0f),
         quadBoardMask(0.0f, 0.0f, 0.0f, 0.0f),
-        font(),
+        font("res/font/Rubik-Light.ttf"),
         progressBar(),
         visFireIntensity(0.0f) {}
 
@@ -148,7 +147,7 @@ void Render::render(float delta, Game& game) {
 
         if (!game.frozen) {
             // Progress bar
-            progressBar.render(delta, *this, game);
+            progressBar.draw(delta, *this, game);
 
             // Stage pips
             for (int i = 0; i < Game::STAGES - 1; i++) {
@@ -192,7 +191,7 @@ void Render::render(float delta, Game& game) {
 
             const float glintIntensity = 1.0f - 4.0f * powf(std::clamp(tile.visTimerShock, 0.0f, 1.0f) - 0.5f, 2.0f);
             if (glintIntensity > 0.0f)
-                painter::draw(tile.quad, textureUiTileLit, shaderDefault, {1.0f, 1.0f, 1.0f, glintIntensity});
+                painter::draw(tile.quad, textureTileLit, shaderDefault, {1.0f, 1.0f, 1.0f, glintIntensity});
         }
     }
 
@@ -240,7 +239,6 @@ void Render::render(float delta, Group& group, bool channelBoard) {
                 } else {
                     currentTileQuad = &tile->quad;
                     painter::draw(tile->quad, textureTileMask, shaderRefract, WHITE);
-                    //painter::draw(tile->quad, textureUiTileLit, shaderDefault, WHITE);
                 }
             }
         }

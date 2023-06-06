@@ -21,6 +21,6 @@ public:
 
     ProgressBar();
 
-    void render(float delta, const Render& render, const Game& game);
+    void draw(float delta, const Render& render, const Game& game);
 
 };

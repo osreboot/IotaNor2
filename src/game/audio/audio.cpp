@@ -4,13 +4,20 @@
 #include "game/audio/audio.h"
 #include "util.h"
 
+void Audio::applyRandomPitch(ma_sound& sound, float pitchMin, float pitchMax) {
+    ma_sound_set_pitch(&sound, map(static_cast<float>(rand() % 1000), 0.0f, 1000.0f, pitchMin, pitchMax));
+}
+
 Audio::Audio() : muted(false) {
+    // Initialize miniaudio engine
     ma_engine_init(nullptr, &engine);
 
+    // Initialize our sound queues
     queuePiecePlace = new AudioQueue(engine, 4, "res/audio/piece_place.wav");
     queuePieceRotate = new AudioQueue(engine, 4, "res/audio/piece_rotate.wav");
     queuePieceHold = new AudioQueue(engine, 4, "res/audio/piece_hold.wav");
 
+    // Load the sound that doesn't need a queue
     ma_sound_init_from_file(&engine, "res/audio/stage_advance.wav", 0, nullptr, nullptr, &soundStageAdvance);
     ma_sound_set_volume(&soundStageAdvance, 0.3f);
 }
@@ -21,10 +28,6 @@ Audio::~Audio() {
     delete queuePieceHold;
 
     ma_engine_uninit(&engine);
-}
-
-void Audio::applyRandomPitch(ma_sound& sound, float pitchMin, float pitchMax) {
-    ma_sound_set_pitch(&sound, map(static_cast<float>(rand() % 1000), 0.0f, 1000.0f, pitchMin, pitchMax));
 }
 
 void Audio::onPiecePlace() {

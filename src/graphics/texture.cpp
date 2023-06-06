@@ -11,10 +11,10 @@ Texture Texture::load(const char *path) {
 
     int w, h;
     unsigned char* image = stbi_load(path, &w, &h, nullptr, 4);
-    return {{w, h}, GL_RGBA8, GL_RGBA, image, false, true};
+    return {{w, h}, GL_RGBA8, GL_RGBA, image, true, false, true};
 }
 
-Texture::Texture(Coordw size, GLint internalFormat, GLint format, const void* pixels, bool vFlip, bool mipmap) : vFlip(vFlip) {
+Texture::Texture(Coordw size, GLint internalFormat, GLint format, void* pixels, bool freePixels, bool vFlip, bool mipmap) : vFlip(vFlip) {
     idTexture = 0; // Silence Clang warnings!
     glGenTextures(1, &idTexture);
     glBindTexture(GL_TEXTURE_2D, idTexture);
@@ -31,6 +31,8 @@ Texture::Texture(Coordw size, GLint internalFormat, GLint format, const void* pi
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    if (freePixels) stbi_image_free(pixels);
 }
 
 Texture::~Texture() {

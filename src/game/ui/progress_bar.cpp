@@ -21,7 +21,7 @@ ProgressBar::ProgressBar() :
         quadWhite(0.0f, 0.0f, W, W / 16.0f),
         visProgress(0.0f) {}
 
-void ProgressBar::render(float delta, const Render& render, const Game &game) {
+void ProgressBar::draw(float delta, const Render& render, const Game &game) {
     int numIlluminated = 0;
     for (int x = 0; x < Game::BOARD_DIM; x++) {
         for (int y = 0; y < Game::BOARD_DIM; y++) {

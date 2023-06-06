@@ -16,8 +16,8 @@ private:
     TextureFBO fboMask, fboMaskChannel0, fboMaskChannel1;
 
     Texture textureTest, textureSolid, textureNoise;
-    Texture textureUiTileLit, textureUiTileSwap, textureUiTileSwapSmall, textureUiCircle, textureUiQueueBox, textureUiAudioMuted;
-    Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL;
+    Texture textureUiTileSwap, textureUiTileSwapSmall, textureUiCircle, textureUiQueueBox, textureUiAudioMuted;
+    Texture textureTileMask, textureTileRefC, textureTileRefL, textureTileRefUL, textureTileLit;
     Texture textureBoardMask;
 
     Quad quadScreen;
