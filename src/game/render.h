@@ -30,7 +30,8 @@ private:
 
     float visFireIntensity;
 
-    const Quad* currentTileQuad = nullptr;
+    bool refractSendTextures = false;
+    const Quad* refractQuad = nullptr;
 
     void render(float delta, Group& group, bool channelBoard);
 

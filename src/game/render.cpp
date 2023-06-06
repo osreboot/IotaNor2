@@ -11,26 +11,28 @@ Render::Render(Game& game) :
         shaderDefault("res/shader/default.vert", "res/shader/default.frag", [](const GLuint&){}),
         shaderAlpha("res/shader/default.vert", "res/shader/alpha_colorize.frag", [](const GLuint&){}),
         shaderRefract("res/shader/default.vert", "res/shader/tile_refract.frag", [&](const GLuint& idProgram){
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, fboRefractedContent.getId());
-            glUniform1i(glGetUniformLocation(idProgram, "textureBackground"), 1);
+            if (refractSendTextures) {
+                glActiveTexture(GL_TEXTURE1);
+                glBindTexture(GL_TEXTURE_2D, fboRefractedContent.getId());
+                glUniform1i(glGetUniformLocation(idProgram, "textureBackground"), 1);
 
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, textureTileRefC.getId());
-            glUniform1i(glGetUniformLocation(idProgram, "textureRefC"), 2);
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, textureTileRefC.getId());
+                glUniform1i(glGetUniformLocation(idProgram, "textureRefC"), 2);
 
-            glActiveTexture(GL_TEXTURE3);
-            glBindTexture(GL_TEXTURE_2D, textureTileRefL.getId());
-            glUniform1i(glGetUniformLocation(idProgram, "textureRefL"), 3);
+                glActiveTexture(GL_TEXTURE3);
+                glBindTexture(GL_TEXTURE_2D, textureTileRefL.getId());
+                glUniform1i(glGetUniformLocation(idProgram, "textureRefL"), 3);
 
-            glActiveTexture(GL_TEXTURE4);
-            glBindTexture(GL_TEXTURE_2D, textureTileRefUL.getId());
-            glUniform1i(glGetUniformLocation(idProgram, "textureRefUL"), 4);
+                glActiveTexture(GL_TEXTURE4);
+                glBindTexture(GL_TEXTURE_2D, textureTileRefUL.getId());
+                glUniform1i(glGetUniformLocation(idProgram, "textureRefUL"), 4);
+            }
 
             glUniform2f(glGetUniformLocation(idProgram, "windowSize"),
                         static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second));
-            glUniform2f(glGetUniformLocation(idProgram, "tileSize"), currentTileQuad->w, currentTileQuad->h);
-            glUniform2f(glGetUniformLocation(idProgram, "tileLocation"), currentTileQuad->x, currentTileQuad->y);
+            glUniform2f(glGetUniformLocation(idProgram, "tileSize"), refractQuad->w, refractQuad->h);
+            glUniform2f(glGetUniformLocation(idProgram, "tileLocation"), refractQuad->x, refractQuad->y);
         }),
         shaderFire("res/shader/default.vert", "res/shader/fire.frag", [&](const GLuint& idProgram){
             glActiveTexture(GL_TEXTURE1);
@@ -186,7 +188,8 @@ void Render::render(float delta, Game& game) {
     for (int x = 0; x < Game::BOARD_DIM; x++) {
         for (int y = 0; y < Game::BOARD_DIM; y++) {
             Tile& tile = game.tiles[x][y];
-            currentTileQuad = &tile.quad;
+            refractSendTextures = x == 0 && y == 0;
+            refractQuad = &tile.quad;
             painter::draw(tile.quad, textureTileMask, shaderRefract, WHITE);
 
             const float glintIntensity = 1.0f - 4.0f * powf(std::clamp(tile.visTimerShock, 0.0f, 1.0f) - 0.5f, 2.0f);
@@ -237,7 +240,8 @@ void Render::render(float delta, Group& group, bool channelBoard) {
                     const bool centerTile = x == Group::DIM / 2 && y == Group::DIM / 2;
                     painter::draw(tile->quad, centerTile ? textureUiTileSwap : textureUiTileSwapSmall, shaderDefault, WHITE);
                 } else {
-                    currentTileQuad = &tile->quad;
+                    refractSendTextures = false;
+                    refractQuad = &tile->quad;
                     painter::draw(tile->quad, textureTileMask, shaderRefract, WHITE);
                 }
             }
