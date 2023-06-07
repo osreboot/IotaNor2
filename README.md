@@ -5,7 +5,11 @@ This project is a new take on my old Ludum Dare 38 [solo submission](https://ldj
   <img src="https://github.com/osreboot/IotaNor2/blob/master/iota_nor_2.gif">
 </p>
 
-A compiled executable is avaliable for download in the [releases section](https://github.com/osreboot/IotaNor2/releases).
+A compiled executable is available for download in the [releases section](https://github.com/osreboot/IotaNor2/releases).
+
+:warning: Windows Defender occasionally flags the game executable as malicious and quarantines the file and/or artificially limits the program's execution speed. You might have to add `IotaNor2.exe` to your Windows Defender exclusions list. *Also be sure to give the game adequate time to load textures and audio when launching (don't spam click the executable). Doing so will almost certainly make your installed antivirus program unhappy.*
+
+The code for this project is available under the [MIT License](https://choosealicense.com/licenses/mit/).
 
 # Controls
 
@@ -36,3 +40,5 @@ This project depends on the following libraries:
 - [GLFW](https://github.com/glfw/glfw) for display management and input polling.
 - [GLEW-cmake](https://github.com/Perlmint/glew-cmake) (and [GLEW](https://github.com/nigels-com/glew)) for loading GLFW.
 - [miniaudio](https://github.com/mackron/miniaudio) for audio loading and playback.
+
+Dependency licenses and source code are available by following the above links.
