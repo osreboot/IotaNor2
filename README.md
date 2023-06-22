@@ -7,7 +7,7 @@ This project is a new take on my old Ludum Dare 38 [solo submission](https://ldj
 
 A compiled executable is available for download in the [releases section](https://github.com/osreboot/IotaNor2/releases).
 
-:warning: Windows Defender occasionally flags the game executable as malicious and quarantines the file and/or artificially limits the program's execution speed. You might have to add `IotaNor2.exe` to your Windows Defender exclusions list. *Also be sure to give the game adequate time to load textures and audio when launching (don't spam click the executable). Doing so will almost certainly make your installed antivirus program unhappy.*
+:warning: Windows Defender occasionally flags the game executable as malicious and quarantines the file and/or artificially limits the program's execution speed. You might have to add `IotaNor2.exe` to your Windows Defender exclusions list. *Also be sure to give the game adequate time to load textures and audio when launching (don't spam click the executable; this will almost certainly make your antivirus program unhappy).*
 
 The code for this project is available under the [MIT License](https://choosealicense.com/licenses/mit/).
 

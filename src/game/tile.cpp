@@ -20,10 +20,8 @@ Tile::Tile() :
 
 void Tile::setIlluminated(bool illuminatedArg) {
     illuminated = illuminatedArg;
+
+    // Update visual animation state due to tile change
     visTimerLastUpdate = 0.0f;
     visTimerShock = 1.0f;
-}
-
-Coordf Tile::getVisLocation(const Coordf& locationGroup, const Coordi& indexGroup) {
-    return getGroupLocation(locationGroup, indexGroup);
 }

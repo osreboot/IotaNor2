@@ -8,6 +8,7 @@ uniform sampler2D textureBase, textureChannel0, textureChannel1;
 uniform vec4 textureColor;
 
 void main() {
+    // Interpolate between 'textureChannel0' and 'textureChannel1' based on 'textureBase'
     float interp = texture(textureBase, uv).r;
     color = (((1.0 - interp) * texture(textureChannel0, uv)) + (interp * texture(textureChannel1, uv))) * textureColor;
 }

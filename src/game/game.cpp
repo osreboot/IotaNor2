@@ -11,23 +11,27 @@
 #include "util.h"
 
 Coordf Game::getWorld(Coordi tile) {
+    // Calculate board boundaries (in world coordinates)
     const Coordw& windowSize = display::getSize();
     const float worldTileMinX = (static_cast<float>(windowSize.first) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMinY = (static_cast<float>(windowSize.second) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMaxX = (static_cast<float>(windowSize.first) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMaxY = (static_cast<float>(windowSize.second) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
 
+    // Convert tile coordinates to world coordinate space
     return {map(static_cast<float>(tile.first), 0, BOARD_DIM, worldTileMinX, worldTileMaxX),
             map(static_cast<float>(tile.second), 0, BOARD_DIM, worldTileMinY, worldTileMaxY)};
 }
 
 Coordi Game::getTile(Coordf world) {
+    // Calculate board boundaries (in world coordinates)
     const Coordw& windowSize = display::getSize();
     const float worldTileMinX = (static_cast<float>(windowSize.first) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMinY = (static_cast<float>(windowSize.second) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMaxX = (static_cast<float>(windowSize.first) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
     const float worldTileMaxY = (static_cast<float>(windowSize.second) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
 
+    // Convert world coordinates to tile coordinate space
     return {static_cast<int>(floor(map(world.first, worldTileMinX, worldTileMaxX, 0, BOARD_DIM))),
             static_cast<int>(floor(map(world.second, worldTileMinY, worldTileMaxY, 0, BOARD_DIM)))};
 }
@@ -40,8 +44,7 @@ Coordf Game::getOriginHold() {
     return getWorld({BOARD_DIM + 2, BOARD_DIM / 2});
 }
 
-Game::Game() : quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f),
-               frozen(true),
+Game::Game() : frozen(true),
                timerFrozenGrace(0.0f),
                stage(0),
                timerInfect(getStageInfectFreq()) {
@@ -55,23 +58,21 @@ Game::~Game() {
 }
 
 void Game::update(float delta) {
-    Coordf locationCursor = display::getCursor();
-    quadDebugCursor.x = locationCursor.first - 192.0f;
-    quadDebugCursor.y = locationCursor.second - 192.0f;
-
     // Handle audio muting
     if (display::hasEventKeyPress(GLFW_KEY_M)) audio.muted = !audio.muted;
 
-    if (frozen) {
+    if (frozen) { // Game is on the end/start screen (and isn't actively running)
 
+        // Detect game start mouse click
         stepTowards(timerFrozenGrace, delta, 0.0f);
         if (timerFrozenGrace <= 0.0f && display::hasEventMouseRelease()) {
             frozen = false;
             stats.onGameStart();
         }
 
-    } else {
+    } else { // Game is running
 
+        // Fill the group queue
         if (groups.empty()) {
             for (int i = 0; i < GROUP_QUEUE_SIZE; i++) groups.push_back(new Group());
         }
@@ -87,7 +88,7 @@ void Game::update(float delta) {
         }
 
         // Clamp group position to board
-        Coordi tileCursor = getTile(locationCursor);
+        Coordi tileCursor = getTile(display::getCursor());
         tileCursor.first = std::clamp(static_cast<int>(tileCursor.first), group->padL, BOARD_DIM - 1 - group->padR);
         tileCursor.second = std::clamp(static_cast<int>(tileCursor.second), group->padU, BOARD_DIM - 1 - group->padD);
         group->location = getWorld(tileCursor);
@@ -114,7 +115,9 @@ void Game::update(float delta) {
                         Tile &tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y -
                                                                                     (Group::DIM / 2)];
                         tile.flipIlluminated();
-                        //tile.setIlluminated(getStageGoal());
+
+                        // // CHEAT: always-correct piece placement
+                        // tile.setIlluminated(getStageGoal());
                     }
                 }
             }
@@ -130,7 +133,7 @@ void Game::update(float delta) {
 
         // Handle board infection spreading
         stepTowards(timerInfect, delta, 0.0f);
-        if (timerInfect <= 0.0f) {
+        if (timerInfect <= 0.0f) { // It's time to infect a new batch of tiles
             timerInfect = getStageInfectFreq();
 
             // Count how many tiles are eligible for infection
@@ -231,11 +234,13 @@ void Game::update(float delta) {
             }
         } else if (shouldPlayInfectionAudio) audio.onPieceInfect();
 
+        // Update group origins for the piece queue
         for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
             groups[i]->location = getOriginQueue(i - 1);
             groups[i]->location.second += Tile::SIZE / 2.0f;
         }
 
+        // Update group origin of the held piece
         if (groupHold) {
             groupHold->location = getOriginHold();
             groupHold->location.second += Tile::SIZE / 2.0f;

@@ -35,7 +35,7 @@ void Audio::onPiecePlace() {
         ma_sound_set_volume(&queuePiecePlace->getCurrent(), 2.5f);
         applyRandomPitch(queuePiecePlace->getCurrent(), 0.9f, 1.4f);
         ma_sound_start(&queuePiecePlace->getCurrent());
-        queuePiecePlace->advance();
+        queuePiecePlace->advance(); // Cycle queue so it's ready for the next sound event
     }
 }
 
@@ -44,7 +44,7 @@ void Audio::onPieceInfect() {
         ma_sound_set_volume(&queuePiecePlace->getCurrent(), 2.5f);
         applyRandomPitch(queuePiecePlace->getCurrent(), 0.6f, 0.8f);
         ma_sound_start(&queuePiecePlace->getCurrent());
-        queuePiecePlace->advance();
+        queuePiecePlace->advance(); // Cycle queue so it's ready for the next sound event
     }
 }
 
@@ -53,7 +53,7 @@ void Audio::onPieceRotate() {
         ma_sound_set_volume(&queuePieceRotate->getCurrent(), 0.25f);
         applyRandomPitch(queuePieceRotate->getCurrent(), 0.9f, 1.1f);
         ma_sound_start(&queuePieceRotate->getCurrent());
-        queuePieceRotate->advance();
+        queuePieceRotate->advance(); // Cycle queue so it's ready for the next sound event
     }
 }
 
@@ -61,7 +61,7 @@ void Audio::onPieceHold() {
     if (!muted) {
         ma_sound_set_volume(&queuePieceHold->getCurrent(), 0.3f);
         ma_sound_start(&queuePieceHold->getCurrent());
-        queuePieceHold->advance();
+        queuePieceHold->advance(); // Cycle queue so it's ready for the next sound event
     }
 }
 

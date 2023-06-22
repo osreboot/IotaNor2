@@ -11,11 +11,13 @@ Quad::Quad(GLfloat x, GLfloat y, GLfloat w, GLfloat h) : Quad(x, y, w, h, 0.0f, 
 Quad::Quad(GLfloat x, GLfloat y, GLfloat w, GLfloat h, GLfloat u0, GLfloat v0, GLfloat u1, GLfloat v1) :
         x(x), y(y), w(w), h(h), u0(u0), v0(v0), u1(u1), v1(v1) {
 
+    // Reserve space for the vertices within OpenGL
     idVertexBuffer = 0; // Silence Clang warnings!
     glGenBuffers(1, &idVertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, idVertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(GLfloat), nullptr, GL_STATIC_DRAW);
 
+    // Reserve space for the UVs within OpenGL
     idUvBuffer = 0; // Silence Clang warnings!
     glGenBuffers(1, &idUvBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, idUvBuffer);
@@ -28,6 +30,7 @@ Quad::~Quad() {
 }
 
 void Quad::pushBuffer(bool vFlip, const Coordw& displaySize) const {
+    // Convert vertices from display coordinates to OpenGL coordinates (e.g. from 0 -> 1920 to -1.0 -> 1.0)
     GLfloat coordsVertexBuffer[] = {
             x, y,
             x + w, y,
@@ -40,9 +43,12 @@ void Quad::pushBuffer(bool vFlip, const Coordw& displaySize) const {
         coordsVertexBuffer[i] = map(coordsVertexBuffer[i], 0.0f, static_cast<float>(displaySize.first), -1.0f, 1.0f);
         coordsVertexBuffer[i + 1] = map(coordsVertexBuffer[i + 1], 0.0f, static_cast<float>(displaySize.second), 1.0f, -1.0f);
     }
+
+    // Update OpenGL vertex buffer with converted data
     glBindBuffer(GL_ARRAY_BUFFER, idVertexBuffer);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(coordsVertexBuffer), coordsVertexBuffer);
 
+    // Update OpenGL UV buffer with current UVs
     GLfloat coordsUvBuffer[] = {
             u0, v0,
             u1, v0,

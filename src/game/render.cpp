@@ -7,10 +7,13 @@
 const Color Render::WHITE = {1.0f, 1.0f, 1.0f, 1.0f};
 const Color Render::BLACK = {0.0f, 0.0f, 0.0f, 1.0f};
 
-Render::Render(Game& game) :
+Render::Render() :
+        // Initialize shaders
         shaderDefault("res/shader/default.vert", "res/shader/default.frag", [](const GLuint&){}),
         shaderAlpha("res/shader/default.vert", "res/shader/alpha_colorize.frag", [](const GLuint&){}),
         shaderRefract("res/shader/default.vert", "res/shader/tile_refract.frag", [&](const GLuint& idProgram){
+            // Once per tick, send the tile refraction textures to the refraction shader (these can be reused across
+            // all tiles).
             if (refractSendTextures) {
                 glActiveTexture(GL_TEXTURE1);
                 glBindTexture(GL_TEXTURE_2D, fboRefractedContent.getId());
@@ -29,12 +32,14 @@ Render::Render(Game& game) :
                 glUniform1i(glGetUniformLocation(idProgram, "textureRefUL"), 4);
             }
 
+            // Send other parameters for tile refraction calculation
             glUniform2f(glGetUniformLocation(idProgram, "windowSize"),
                         static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second));
             glUniform2f(glGetUniformLocation(idProgram, "tileSize"), refractQuad->w, refractQuad->h);
             glUniform2f(glGetUniformLocation(idProgram, "tileLocation"), refractQuad->x, refractQuad->y);
         }),
         shaderFire("res/shader/default.vert", "res/shader/fire.frag", [&](const GLuint& idProgram){
+            // Send the fire textures
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboFire0.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureFire0"), 1);
@@ -43,9 +48,11 @@ Render::Render(Game& game) :
             glBindTexture(GL_TEXTURE_2D, fboFire1.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureFire1"), 2);
 
+            // Send the fire intensity scaling value
             glUniform1f(glGetUniformLocation(idProgram, "intensity"),visFireIntensity);
         }),
         shaderMask("res/shader/default.vert", "res/shader/mask.frag", [&](const GLuint& idProgram){
+            // Send the textures to interpolate between
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, fboMaskChannel0.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureChannel0"), 1);
@@ -54,6 +61,8 @@ Render::Render(Game& game) :
             glBindTexture(GL_TEXTURE_2D, fboMaskChannel1.getId());
             glUniform1i(glGetUniformLocation(idProgram, "textureChannel1"), 2);
         }),
+
+        // Initialize FBOs
         fboFire0(TextureFBO::build(display::getSize())),
         fboFire1(TextureFBO::build(display::getSize())),
         fboGameContent(TextureFBO::build(display::getSize())),
@@ -61,6 +70,8 @@ Render::Render(Game& game) :
         fboMask(TextureFBO::build(display::getSize())),
         fboMaskChannel0(TextureFBO::build(display::getSize())),
         fboMaskChannel1(TextureFBO::build(display::getSize())),
+
+        // Initialize textures
         textureTest(Texture::load("res/texture/ui/test.png")),
         textureSolid(Texture::load("res/texture/ui/solid.png")),
         textureNoise(Texture::load("res/texture/ui/noise.png")),
@@ -75,6 +86,9 @@ Render::Render(Game& game) :
         textureUiQueueBox(Texture::load("res/texture/ui/queue_outline.png")),
         textureUiAudioMuted(Texture::load("res/texture/ui/mute.png")),
         textureBoardMask(Texture::load("res/texture/ui/board_mask.png")),
+
+        // Initialize quads (some values don't matter and are replaced every tick)
+        quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f),
         quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)),
         quadUiStageS(0.0f, 0.0f, 6.0f, 6.0f),
         quadUiStageL(0.0f, 0.0f, 8.0f, 8.0f),
@@ -82,12 +96,18 @@ Render::Render(Game& game) :
         quadUiAudioMuted(0.0f, 0.0f, 64.0f, 64.0f),
         quadTileInfection(0.0f, 0.0f, 0.0f, 0.0f),
         quadBoardMask(0.0f, 0.0f, 0.0f, 0.0f),
+
+        // Initialize other elements
         font("res/font/Rubik-Light.ttf"),
         progressBar(),
         visFireIntensity(0.0f) {}
 
 void Render::render(float delta, Game& game) {
     timer += delta;
+
+    // Move the debug quad on top of the cursor
+    quadDebugCursor.x = display::getCursor().first - 192.0f;
+    quadDebugCursor.y = display::getCursor().second - 192.0f;
 
     // Update tile visuals
     for (int x = 0; x < Game::BOARD_DIM; x++) {
@@ -124,8 +144,11 @@ void Render::render(float delta, Game& game) {
         for (int x = 0; x < Game::BOARD_DIM; x++) {
             for (int y = 0; y < Game::BOARD_DIM; y++) {
                 Tile& tile = game.tiles[x][y];
+
+                // Render a white square behind the tile if it's illuminated
                 if (tile.isIlluminated()) painter::draw(tile.quad, textureTileMask, shaderDefault, WHITE);
 
+                // Render the tile infection square, if necessary
                 if (tile.timerInfect > 0.0f) {
                     const float intensityInfection = 1.0f - powf(1.0f - (tile.timerInfect / game.getStageInfectTime()), 4.0f);
                     const float sizeInfection = map(intensityInfection, 1.0f, 0.0f, 8.0f, tile.quad.w);
@@ -139,7 +162,7 @@ void Render::render(float delta, Game& game) {
             }
         }
 
-        // Queue and hold box outlines
+        // Render queue and hold box outlines
         quadUiQueueBox.x = Game::getOriginQueue(0).first - (quadUiQueueBox.w / 2.0f);
         quadUiQueueBox.y = Game::getOriginQueue(0).second + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
         painter::draw(quadUiQueueBox, textureUiQueueBox, shaderDefault, WHITE);
@@ -148,10 +171,10 @@ void Render::render(float delta, Game& game) {
         painter::draw(quadUiQueueBox, textureUiQueueBox, shaderDefault, WHITE);
 
         if (!game.frozen) {
-            // Progress bar
+            // Render progress bar
             progressBar.draw(delta, *this, game);
 
-            // Stage pips
+            // Render stage pips
             for (int i = 0; i < Game::STAGES - 1; i++) {
                 quadUiStageL.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageL.w / 2.0f) -
                                  (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
@@ -164,10 +187,10 @@ void Render::render(float delta, Game& game) {
             }
         }
 
-        // Text
-        game.stats.render(*this, game, font);
+        // Render stats text
+        game.stats.draw(*this, game, font);
 
-        // Audio muted icon
+        // Render the audio muted icon
         if (game.audio.muted) {
             quadUiAudioMuted.x = 16.0f;
             quadUiAudioMuted.y = static_cast<float>(display::getSize().second) - quadUiAudioMuted.h - 16.0f;
@@ -178,7 +201,7 @@ void Render::render(float delta, Game& game) {
     // Capture all background elements (so they can be processed by the tile refraction shader)
     fboRefractedContent.capture(true, [&](){
         painter::draw(quadScreen, fboGameContent, shaderFire, WHITE);
-        //painter::draw(game.quadDebugCursor, textureTest, shaderDefault, WHITE);
+        //painter::draw(quadDebugCursor, textureTest, shaderDefault, WHITE);
     });
 
     // Display all background elements
@@ -207,6 +230,7 @@ void Render::render(float delta, Game& game) {
         painter::draw(quadBoardMask, textureBoardMask, shaderDefault, WHITE);
     });
 
+    // Capture the floating (grouped) tiles (only the glassy versions)
     fboMaskChannel0.capture(true, [&](){
         for (Group* group : game.groups) render(delta, *group, false);
         if (game.groupHold) render(delta, *game.groupHold, false);
@@ -214,11 +238,16 @@ void Render::render(float delta, Game& game) {
     fboMaskChannel1.capture(true, [&](){});
     painter::draw(quadScreen, fboMask, shaderMask, WHITE);
 
+    // Capture the floating (grouped) tiles (only the UI swap icon versions)
     fboMaskChannel0.capture(true, [&](){});
     fboMaskChannel1.capture(true, [&](){
         for (Group* group : game.groups) render(delta, *group, true);
         if (game.groupHold) render(delta, *game.groupHold, true);
     });
+
+    // Display the floating (grouped) tiles, using the masking shader to fade between the glassy versions and the UI
+    // swap icons. The UI swap icons display by inverting the background color, so we need to change the OpenGL blend
+    // mode to achieve this effect.
     glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
     painter::draw(quadScreen, fboMask, shaderMask, WHITE);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -229,17 +258,19 @@ void Render::render(float delta, Group& group, bool channelBoard) {
         for (int y = 0; y < Group::DIM; y++) {
             TileFloating* const tile = group.tiles[y * Group::DIM + x];
 
-            if (tile) {
-                tile->update(delta, group.location, {x, y});
+            if (tile) { // If a tile is present at this location within the group array
+                tile->update(delta, group.location, {x, y}); // Update floating tile state
 
-                Coordf tileVisLocation = tile->getVisLocation(group.location, {x, y});
-                tile->quad.x = tileVisLocation.first;
-                tile->quad.y = tileVisLocation.second;
+                // Adjust floating tile quad position
+                tile->quad.x = tile->visLocation.first;
+                tile->quad.y = tile->visLocation.second;
 
                 if (channelBoard) {
+                    // Render the swap icon UI element
                     const bool centerTile = x == Group::DIM / 2 && y == Group::DIM / 2;
                     painter::draw(tile->quad, centerTile ? textureUiTileSwap : textureUiTileSwapSmall, shaderDefault, WHITE);
                 } else {
+                    // Render the glassy tile with the refraction shader
                     refractSendTextures = false;
                     refractQuad = &tile->quad;
                     painter::draw(tile->quad, textureTileMask, shaderRefract, WHITE);
