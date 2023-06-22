@@ -20,6 +20,8 @@ private:
 
     // Debug and generic textures
     Texture textureTest, textureSolid, textureNoise;
+
+    // Various UI textures
     Texture textureUiTileSwap, textureUiTileSwapSmall, textureUiCircle, textureUiQueueBox, textureUiAudioMuted;
 
     // Refraction map and tile-specific textures
