@@ -2,7 +2,7 @@
 This project is a new take on my old Ludum Dare 38 [solo submission](https://ldjam.com/events/ludum-dare/38/iota-nor). Featuring an experimental glass tile rendering system, new visuals, a complete mechanical overhaul, new audio and more!
 
 <p align="center">
-  <img src="https://github.com/osreboot/IotaNor2/blob/master/iota_nor_2.gif">
+  <img src="https://imagedelivery.net/-HRWkhCPYrm_PXmT8LmujQ/showcase/iotanorGameplay/public">
 </p>
 
 🎥 Check out this [YouTube video](https://youtu.be/TaG8Sdjm3cg) that shows a complete walkthrough (and general gameplay)!
