@@ -115,7 +115,7 @@ void Game::update(float delta) {
                         tile.flipIlluminated();
 
                         // // CHEAT: always-correct piece placement
-                         tile.setIlluminated(getStageGoal());
+                        // tile.setIlluminated(getStageGoal());
                     }
                 }
             }

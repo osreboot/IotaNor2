@@ -126,7 +126,7 @@ void Render::render(float delta, Game& game) {
     }
 
     // Capture fire elements
-    stepTowards(visFireIntensity, delta / 3.0f, static_cast<float>(game.stage) / static_cast<float>(Game::STAGES - 1));
+    stepTowards(visFireIntensity, delta / 3.0f, (float)game.stage / (float)(Game::STAGES - 1));
     quadScreen.setUVs((timer / 32.0f), (timer / 16.0f), (timer / 32.0f) + 1.0f, (timer / 16.0f) + 0.4f);
     fboFire0.capture(true, [&](){
         painter::draw(quadScreen, textureNoise, shaderDefault, WHITE);
@@ -175,13 +175,13 @@ void Render::render(float delta, Game& game) {
 
             // Render stage pips
             for (int i = 0; i < Game::STAGES - 1; i++) {
-                quadUiStageL.x = (static_cast<float>(display::getSize().x) / 2.0f) - (quadUiStageL.w / 2.0f) -
-                                 (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
-                quadUiStageL.y = static_cast<float>(display::getSize().y) - 48.0f - (quadUiStageL.h / 2.0f);
+                quadUiStageL.x = ((float)display::getSize().x / 2.0f) - (quadUiStageL.w / 2.0f) -
+                                 (Game::STAGES / 2.0f) * 64.0f + ((float)(i + 1) * 64.0f);
+                quadUiStageL.y = (float)display::getSize().y - 48.0f - (quadUiStageL.h / 2.0f);
                 painter::draw(quadUiStageL, textureUiCircle, shaderDefault, WHITE);
-                quadUiStageS.x = (static_cast<float>(display::getSize().x) / 2.0f) - (quadUiStageS.w / 2.0f) -
-                                 (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
-                quadUiStageS.y = static_cast<float>(display::getSize().y) - 48.0f - (quadUiStageS.h / 2.0f);
+                quadUiStageS.x = ((float)display::getSize().x / 2.0f) - (quadUiStageS.w / 2.0f) -
+                                 (Game::STAGES / 2.0f) * 64.0f + ((float)(i + 1) * 64.0f);
+                quadUiStageS.y = (float)display::getSize().y - 48.0f - (quadUiStageS.h / 2.0f);
                 if(game.stage <= i) painter::draw(quadUiStageS, textureUiCircle, shaderDefault, BLACK);
             }
         }

@@ -17,7 +17,7 @@ public:
     vec2i operator*(const vec2i& other) const { return {x * other.x, y * other.y}; }
     vec2i operator/(const vec2i& other) const { return {x / other.x, y / other.y}; }
 
-    vec2f operator()() const {
+    explicit operator vec2f() const {
         return {(float)x, (float)y};
     }
 
