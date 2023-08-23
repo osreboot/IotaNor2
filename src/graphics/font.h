@@ -4,7 +4,7 @@
 
 #include "graphics/painter.h"
 #include "graphics/quad.h"
-#include "types.h"
+#include "vec2f.h"
 
 // Handles loading and rendering a single .ttf font
 class Font {
@@ -24,9 +24,9 @@ public:
     ~Font();
 
     // Returns the pixel size 'str' would be if drawn to the screen
-    Coordf getSize(const char* str) const;
+    vec2f getSize(const char* str) const;
 
     // Renders 'str' to the screen
-    void draw(const Render& render, const char* str, Coordf location, Color color);
+    void draw(const Render& render, const char* str, vec2f location, Color color);
 
 };

@@ -34,6 +34,7 @@ target_sources(${PROJECT_NAME} PRIVATE
         graphics/texture_frame_buffer.cpp
         graphics/truetype_init.cpp
         main.cpp
-        types.h
         util.h
+        vec2f.h
+        vec2i.h
         )

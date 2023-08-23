@@ -1,6 +1,8 @@
 #pragma once
 
 #include "graphics/quad.h"
+#include "vec2f.h"
+#include "vec2i.h"
 
 // Represents a tile (aligned to the board), the tile's infection state, and the tile's graphical resources and
 // animation information.
@@ -14,7 +16,7 @@ public:
     static const float INFECTION_DISABLED; // Assign this value to 'timerInfect' to clear the tile's infection status
 
     // Returns the world location of a specific tile, given the location of its group and its index within the group
-    static Coordf getGroupLocation(const Coordf& locationGroup, const Coordi& indexGroup);
+    static vec2f getGroupLocation(const vec2f& locationGroup, const vec2i& indexGroup);
 
     // Values related to tile visual animation state
     float visTimerLastUpdate, visTimerShock;

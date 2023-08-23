@@ -9,11 +9,11 @@ private:
 
 public:
     // The current world location of the tile's sprite
-    Coordf visLocation;
+    vec2f visLocation;
 
     TileFloating();
 
     // Advances tile state by 'delta' seconds
-    void update(float delta, const Coordf &locationGroup, const Coordi &indexGroup);
+    void update(float delta, const vec2f &locationGroup, const vec2i &indexGroup);
 
 };

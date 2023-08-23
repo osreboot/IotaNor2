@@ -14,12 +14,12 @@ Texture Texture::load(const char *path) {
     return {{w, h}, GL_RGBA8, GL_RGBA, image, true, false, true};
 }
 
-Texture::Texture(Coordw size, GLint internalFormat, GLint format, void* pixels, bool freePixels, bool vFlip, bool mipmap) : vFlip(vFlip) {
+Texture::Texture(vec2i size, GLint internalFormat, GLint format, void* pixels, bool freePixels, bool vFlip, bool mipmap) : vFlip(vFlip) {
     // Reserve the texture within the OpenGL context
     idTexture = 0; // Silence Clang warnings!
     glGenTextures(1, &idTexture);
     glBindTexture(GL_TEXTURE_2D, idTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, size.first, size.second, 0, format, GL_UNSIGNED_BYTE, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, size.x, size.y, 0, format, GL_UNSIGNED_BYTE, pixels);
 
     // Generate mipmaps
     if (mipmap) {

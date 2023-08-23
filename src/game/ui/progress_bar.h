@@ -1,6 +1,7 @@
 #pragma once
 
-#include "types.h"
+class Render;
+
 #include "graphics/texture.h"
 #include "graphics/quad.h"
 

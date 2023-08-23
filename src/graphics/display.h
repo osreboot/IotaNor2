@@ -1,6 +1,7 @@
 #pragma once
 
-#include "types.h"
+#include "vec2f.h"
+#include "vec2i.h"
 
 namespace display {
 
@@ -14,10 +15,10 @@ namespace display {
     bool isExiting();
 
     // Returns the size of the display
-    const Coordw& getSize();
+    const vec2i& getSize();
 
     // Returns the position of the mouse cursor
-    const Coordf& getCursor();
+    const vec2f& getCursor();
 
     // Returns true if an input-related event has been triggered on this particular tick
     bool hasEventMousePress();

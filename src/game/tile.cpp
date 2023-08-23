@@ -5,10 +5,10 @@
 const float Tile::SIZE = 128.0f;
 const float Tile::INFECTION_DISABLED = -1.0f;
 
-Coordf Tile::getGroupLocation(const Coordf &locationGroup, const Coordi &indexGroup) {
+vec2f Tile::getGroupLocation(const vec2f& locationGroup, const vec2i& indexGroup) {
     const float offsetGroup = static_cast<float>(Group::DIM) * SIZE / 2.0f;
-    return {locationGroup.first - offsetGroup + static_cast<float>(indexGroup.first) * SIZE,
-            locationGroup.second - offsetGroup + static_cast<float>(indexGroup.second) * SIZE};
+    return {locationGroup.x - offsetGroup + (float)indexGroup.x * SIZE,
+            locationGroup.y - offsetGroup + (float)indexGroup.y * SIZE};
 }
 
 Tile::Tile() :

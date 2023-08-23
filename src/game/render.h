@@ -1,5 +1,7 @@
 #pragma once
 
+class Game;
+
 #include "game/ui/progress_bar.h"
 #include "graphics/font.h"
 #include "graphics/painter.h"

@@ -25,30 +25,30 @@ Font::~Font() {
     delete texture;
 }
 
-Coordf Font::getSize(const char *str) const {
+vec2f Font::getSize(const char *str) const {
     // The size of 'output' is automatically shifted when calling 'stbtt_GetBakedQuad'
-    Coordf output = {0.0f, 0.0f};
+    vec2f output;
     stbtt_aligned_quad q;
     for (int i = 0; i < std::strlen(str); i++) {
         if (str[i] >= 32) {
             // Lookup the size and location of the current character
             float y;
-            stbtt_GetBakedQuad(ttCharData, 512, 512, str[i] - 32, &output.first, &y, &q, 1);
+            stbtt_GetBakedQuad(ttCharData, 512, 512, str[i] - 32, &output.x, &y, &q, 1);
 
             // We're only tracking the height of a single line, which is the maximum character height
-            output.second = std::max(output.second, q.y1 - q.y0);
+            output.y = std::max(output.y, q.y1 - q.y0);
         }
     }
-    output.first += q.x1 - q.x0; // Include the width of the last character
+    output.x += q.x1 - q.x0; // Include the width of the last character
     return output;
 }
 
-void Font::draw(const Render& render, const char* str, Coordf location, Color color) {
+void Font::draw(const Render& render, const char* str, vec2f location, Color color) {
     for (int i = 0; i < std::strlen(str); i++) {
         if (str[i] >= 32) {
             // Lookup the size and location of the current character
             stbtt_aligned_quad q;
-            stbtt_GetBakedQuad(ttCharData, 512, 512, str[i] - 32, &location.first, &location.second, &q, 1);
+            stbtt_GetBakedQuad(ttCharData, 512, 512, str[i] - 32, &location.x, &location.y, &q, 1);
 
             // Set the quad position and texture UVs based on current character
             quad.x = q.x0;

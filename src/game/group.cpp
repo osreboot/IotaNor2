@@ -3,10 +3,11 @@
 
 #include "game/group.h"
 #include "game/tile_floating.h"
+#include "vec2i.h"
 
 // Basic shapes, values represent group tile indices (plus the middle piece (4) which is always present). Array is
 // indexed randomly, so some shapes appear twice to influence the selection probability
-static const Coordi SHAPES[] = {
+static const vec2i SHAPES[] = {
         {0, 5}, // j
         {2, 3},
         {0, 8}, // /
@@ -46,10 +47,10 @@ void Group::calculatePadding() {
 
 Group::Group() : rotation(0), tiles() {
     // Create random shape
-    Coordi tilesShape = SHAPES[rand() % (sizeof(SHAPES) / sizeof(Coordi))];
+    vec2i tilesShape = SHAPES[rand() % (sizeof(SHAPES) / sizeof(vec2i))];
     tiles[4] = new TileFloating();
-    tiles[tilesShape.first] = new TileFloating();
-    tiles[tilesShape.second] = new TileFloating();
+    tiles[tilesShape.x] = new TileFloating();
+    tiles[tilesShape.y] = new TileFloating();
 
     calculatePadding();
 }

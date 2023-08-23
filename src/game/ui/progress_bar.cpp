@@ -31,13 +31,13 @@ void ProgressBar::draw(float delta, const Render& render, const Game &game) {
             if (game.tiles[x][y].isIlluminated()) numIlluminated++;
         }
     }
-    float progress = static_cast<float>(numIlluminated) / static_cast<float>(Game::BOARD_DIM * Game::BOARD_DIM);
+    float progress = (float)numIlluminated / (float)(Game::BOARD_DIM * Game::BOARD_DIM);
 
     // Step visual progress towards the real progress value
     stepTowards(visProgress, delta / 2.0f, progress);
 
     // Display background texture
-    quad.x = (static_cast<float>(display::getSize().first) / 2.0f) - (WIDTH / 2.0f);
+    quad.x = ((float)display::getSize().x / 2.0f) - (WIDTH / 2.0f);
     quad.y = POS_Y - (WIDTH * ASPECT * 0.5f) * 0.75f;
     painter::draw(quad, textureEndsBack, render.shaderDefault, Render::WHITE);
 

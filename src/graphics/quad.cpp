@@ -29,7 +29,7 @@ Quad::~Quad() {
     glDeleteBuffers(1, &idUvBuffer);
 }
 
-void Quad::pushBuffer(bool vFlip, const Coordw& displaySize) const {
+void Quad::pushBuffer(bool vFlip, const vec2i& displaySize) const {
     // Convert vertices from display coordinates to OpenGL coordinates (e.g. from 0 -> 1920 to -1.0 -> 1.0)
     GLfloat coordsVertexBuffer[] = {
             x, y,
@@ -40,8 +40,8 @@ void Quad::pushBuffer(bool vFlip, const Coordw& displaySize) const {
             x + w, y,
     };
     for(int i = 0; i < sizeof(coordsVertexBuffer) / sizeof(GLfloat); i += 2){
-        coordsVertexBuffer[i] = map(coordsVertexBuffer[i], 0.0f, static_cast<float>(displaySize.first), -1.0f, 1.0f);
-        coordsVertexBuffer[i + 1] = map(coordsVertexBuffer[i + 1], 0.0f, static_cast<float>(displaySize.second), 1.0f, -1.0f);
+        coordsVertexBuffer[i] = map(coordsVertexBuffer[i], 0.0f, (float)displaySize.x, -1.0f, 1.0f);
+        coordsVertexBuffer[i + 1] = map(coordsVertexBuffer[i + 1], 0.0f, (float)displaySize.y, 1.0f, -1.0f);
     }
 
     // Update OpenGL vertex buffer with converted data

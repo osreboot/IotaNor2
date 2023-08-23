@@ -10,37 +10,37 @@
 #include "graphics/display.h"
 #include "util.h"
 
-Coordf Game::getWorld(Coordi tile) {
+vec2f Game::getWorld(vec2i tile) {
     // Calculate board boundaries (in world coordinates)
-    const Coordw& windowSize = display::getSize();
-    const float worldTileMinX = (static_cast<float>(windowSize.first) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
-    const float worldTileMinY = (static_cast<float>(windowSize.second) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
-    const float worldTileMaxX = (static_cast<float>(windowSize.first) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
-    const float worldTileMaxY = (static_cast<float>(windowSize.second) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
+    const vec2i& windowSize = display::getSize();
+    const float worldTileMinX = ((float)windowSize.x / 2.0f) - ((float)BOARD_DIM * Tile::SIZE / 2.0f);
+    const float worldTileMinY = ((float)windowSize.y / 2.0f) - ((float)BOARD_DIM * Tile::SIZE / 2.0f);
+    const float worldTileMaxX = ((float)windowSize.x / 2.0f) + ((float)BOARD_DIM * Tile::SIZE / 2.0f);
+    const float worldTileMaxY = ((float)windowSize.y / 2.0f) + ((float)BOARD_DIM * Tile::SIZE / 2.0f);
 
     // Convert tile coordinates to world coordinate space
-    return {map(static_cast<float>(tile.first), 0, BOARD_DIM, worldTileMinX, worldTileMaxX),
-            map(static_cast<float>(tile.second), 0, BOARD_DIM, worldTileMinY, worldTileMaxY)};
+    return {map((float)tile.x, 0, BOARD_DIM, worldTileMinX, worldTileMaxX),
+            map((float)tile.y, 0, BOARD_DIM, worldTileMinY, worldTileMaxY)};
 }
 
-Coordi Game::getTile(Coordf world) {
+vec2i Game::getTile(vec2f world) {
     // Calculate board boundaries (in world coordinates)
-    const Coordw& windowSize = display::getSize();
-    const float worldTileMinX = (static_cast<float>(windowSize.first) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
-    const float worldTileMinY = (static_cast<float>(windowSize.second) / 2.0f) - (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
-    const float worldTileMaxX = (static_cast<float>(windowSize.first) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
-    const float worldTileMaxY = (static_cast<float>(windowSize.second) / 2.0f) + (static_cast<float>(BOARD_DIM) * Tile::SIZE / 2.0f);
+    const vec2i& windowSize = display::getSize();
+    const float worldTileMinX = ((float)windowSize.x / 2.0f) - ((float)BOARD_DIM * Tile::SIZE / 2.0f);
+    const float worldTileMinY = ((float)windowSize.y / 2.0f) - ((float)BOARD_DIM * Tile::SIZE / 2.0f);
+    const float worldTileMaxX = ((float)windowSize.x / 2.0f) + ((float)BOARD_DIM * Tile::SIZE / 2.0f);
+    const float worldTileMaxY = ((float)windowSize.y / 2.0f) + ((float)BOARD_DIM * Tile::SIZE / 2.0f);
 
     // Convert world coordinates to tile coordinate space
-    return {static_cast<int>(floor(map(world.first, worldTileMinX, worldTileMaxX, 0, BOARD_DIM))),
-            static_cast<int>(floor(map(world.second, worldTileMinY, worldTileMaxY, 0, BOARD_DIM)))};
+    return {(int)std::floor(map((float)world.x, worldTileMinX, worldTileMaxX, 0, BOARD_DIM)),
+            (int)std::floor(map((float)world.y, worldTileMinY, worldTileMaxY, 0, BOARD_DIM))};
 }
 
-Coordf Game::getOriginQueue(int index) {
+vec2f Game::getOriginQueue(int index) {
     return getWorld({(-4 * (index + 1)) + 2, BOARD_DIM / 2});
 }
 
-Coordf Game::getOriginHold() {
+vec2f Game::getOriginHold() {
     return getWorld({BOARD_DIM + 2, BOARD_DIM / 2});
 }
 
@@ -88,12 +88,11 @@ void Game::update(float delta) {
         }
 
         // Clamp group position to board
-        Coordi tileCursor = getTile(display::getCursor());
-        tileCursor.first = std::clamp(static_cast<int>(tileCursor.first), group->padL, BOARD_DIM - 1 - group->padR);
-        tileCursor.second = std::clamp(static_cast<int>(tileCursor.second), group->padU, BOARD_DIM - 1 - group->padD);
+        vec2i tileCursor = getTile(display::getCursor());
+        tileCursor.x = std::clamp(tileCursor.x, group->padL, BOARD_DIM - 1 - group->padR);
+        tileCursor.y = std::clamp(tileCursor.y, group->padU, BOARD_DIM - 1 - group->padD);
         group->location = getWorld(tileCursor);
-        group->location.first += Tile::SIZE / 2.0f;
-        group->location.second += Tile::SIZE / 2.0f;
+        group->location = group->location + (Tile::SIZE / 2.0f);
 
         // Handle group holding
         if (display::hasEventKeyPress(GLFW_KEY_SPACE)) {
@@ -112,12 +111,11 @@ void Game::update(float delta) {
             for (int x = 0; x < Group::DIM; x++) {
                 for (int y = 0; y < Group::DIM; y++) {
                     if (group->tiles[y * Group::DIM + x]) {
-                        Tile &tile = tiles[tileCursor.first + x - (Group::DIM / 2)][tileCursor.second + y -
-                                                                                    (Group::DIM / 2)];
+                        Tile &tile = tiles[tileCursor.x + x - (Group::DIM / 2)][tileCursor.y + y - (Group::DIM / 2)];
                         tile.flipIlluminated();
 
                         // // CHEAT: always-correct piece placement
-                        // tile.setIlluminated(getStageGoal());
+                         tile.setIlluminated(getStageGoal());
                     }
                 }
             }
@@ -211,14 +209,13 @@ void Game::update(float delta) {
             stats.onStageAdvance();
 
             // Locate the most recently updated tile (for stage clear ripple animation)
-            Coordi tileLastUpdate = {0, 0};
+            vec2i tileLastUpdate = {0, 0};
             float deltaLastUpdate = FLT_MAX;
             for (int x = 0; x < BOARD_DIM; x++) {
                 for (int y = 0; y < BOARD_DIM; y++) {
                     if (tiles[x][y].visTimerLastUpdate < deltaLastUpdate) {
                         deltaLastUpdate = tiles[x][y].visTimerLastUpdate;
-                        tileLastUpdate.first = x;
-                        tileLastUpdate.second = y;
+                        tileLastUpdate = {x, y};
                     }
                 }
             }
@@ -229,7 +226,7 @@ void Game::update(float delta) {
                     Tile &tile = tiles[x][y];
                     tile.timerInfect = Tile::INFECTION_DISABLED;
                     tile.visTimerLastUpdate = 0.0f;
-                    tile.visTimerShock = 1.0f + distance(x, y, tileLastUpdate.first, tileLastUpdate.second) / 3.0f;
+                    tile.visTimerShock = 1.0f + distance(x, y, tileLastUpdate.x, tileLastUpdate.y) / 3.0f;
                 }
             }
         } else if (shouldPlayInfectionAudio) audio.onPieceInfect();
@@ -237,13 +234,13 @@ void Game::update(float delta) {
         // Update group origins for the piece queue
         for (int i = 1; i < GROUP_QUEUE_SIZE; i++) {
             groups[i]->location = getOriginQueue(i - 1);
-            groups[i]->location.second += Tile::SIZE / 2.0f;
+            groups[i]->location.y += Tile::SIZE / 2.0f;
         }
 
         // Update group origin of the held piece
         if (groupHold) {
             groupHold->location = getOriginHold();
-            groupHold->location.second += Tile::SIZE / 2.0f;
+            groupHold->location.y += Tile::SIZE / 2.0f;
         }
 
     }

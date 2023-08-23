@@ -1,6 +1,8 @@
 #pragma once
 
-#include "types.h"
+#include "GL/glew.h"
+
+#include "vec2i.h"
 
 // Class that represents a simple rectangle (that can also optionally store texture UVs). Used as the canvas for
 // rendering textures, colors, and invoking shader programs.
@@ -24,7 +26,7 @@ public:
 
     // Binds the quad vertex data for rendering (after converting it from display coordinates to OpenGL coordinates,
     // e.g. from 0 -> 1920 to -1.0 -> 1.0).
-    void pushBuffer(bool vFlip, const Coordw& displaySize) const;
+    void pushBuffer(bool vFlip, const vec2i& displaySize) const;
 
     void setUVs(GLfloat u0, GLfloat v0, GLfloat u1, GLfloat v1);
 

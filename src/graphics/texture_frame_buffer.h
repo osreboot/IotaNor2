@@ -3,6 +3,7 @@
 #include <functional>
 
 #include "graphics/texture.h"
+#include "vec2i.h"
 
 // Represents an automatically managed frame buffer object
 class TextureFBO : public Texture {
@@ -10,11 +11,11 @@ class TextureFBO : public Texture {
 private:
     GLuint idFrameBuffer;
 
-    TextureFBO(Coordw size, GLuint idFrameBuffer);
+    TextureFBO(vec2i size, GLuint idFrameBuffer);
 
 public:
     // Reserves a frame buffer of pixel resolution 'size'
-    static TextureFBO build(Coordw size);
+    static TextureFBO build(vec2i size);
 
     // Disable copying. This is necessary because we need to keep this instance consistent with the texture ID reserved
     // within the OpenGL context.

@@ -49,13 +49,13 @@ void Stats::draw(const Render& render, const Game& game, Font& font) {
 
         // Display the title cards
         std::string strTitle = "Iota Nor";
-        Coordf locationStrTitle = {Game::getOriginQueue(0).first - (font.getSize(strTitle.c_str()).first / 2.0f),
-                                   Game::getOriginQueue(0).second + (Tile::SIZE / 2.0f) + FONT_OFFSET_Y};
+        vec2f locationStrTitle = {Game::getOriginQueue(0).x - (font.getSize(strTitle.c_str()).x / 2.0f),
+                                   Game::getOriginQueue(0).y + (Tile::SIZE / 2.0f) + FONT_OFFSET_Y};
         font.draw(render, strTitle.c_str(), locationStrTitle, Render::BLACK);
 
         std::string strCredit = "by Calvin Weaver";
-        Coordf locationStrCredit = {Game::getOriginHold().first - (font.getSize(strCredit.c_str()).first / 2.0f),
-                                    Game::getOriginHold().second + (Tile::SIZE / 2.0f) + FONT_OFFSET_Y};
+        vec2f locationStrCredit = {Game::getOriginHold().x - (font.getSize(strCredit.c_str()).x / 2.0f),
+                                    Game::getOriginHold().y + (Tile::SIZE / 2.0f) + FONT_OFFSET_Y};
         font.draw(render, strCredit.c_str(), locationStrCredit, Render::BLACK);
 
         // Check if the player just finished a game
@@ -64,7 +64,7 @@ void Stats::draw(const Render& render, const Game& game, Font& font) {
             std::stringstream stream;
             stream << std::fixed << std::setprecision(2) << timerTotal;
             std::string strFinish = stream.str() + "  seconds            " + std::to_string(piecesTotal) + "  pieces";
-            Coordf locationStrFinish = {(static_cast<float>(display::getSize().first) / 2.0f) - (font.getSize(strFinish.c_str()).first / 2.0f), POS_Y + FONT_OFFSET_Y};
+            vec2f locationStrFinish = {((float)display::getSize().x / 2.0f) - (font.getSize(strFinish.c_str()).x / 2.0f), POS_Y + FONT_OFFSET_Y};
             font.draw(render, strFinish.c_str(), locationStrFinish, Render::WHITE);
         }
 
@@ -72,18 +72,16 @@ void Stats::draw(const Render& render, const Game& game, Font& font) {
         if (game.timerFrozenGrace <= 0.0f) {
             // Display start prompt
             std::string strStart = "click to start";
-            Coordf locationStrStart = {(static_cast<float>(display::getSize().first) / 2.0f) - (font.getSize(strStart.c_str()).first / 2.0f),
-                                       static_cast<float>(display::getSize().second) - POS_Y + FONT_OFFSET_Y};
+            vec2f locationStrStart = {((float)display::getSize().x / 2.0f) - (font.getSize(strStart.c_str()).x / 2.0f),
+                                       (float)display::getSize().y - POS_Y + FONT_OFFSET_Y};
             font.draw(render, strStart.c_str(), locationStrStart, Render::WHITE);
         }
     } else {
         // Calculate text offsets for stats messages
         float yTextUp = POS_Y + FONT_OFFSET_Y;
-        float yTextDown = static_cast<float>(display::getSize().second) - POS_Y + FONT_OFFSET_Y;
-        float xTextLeft = (static_cast<float>(display::getSize().first) / 2.0f)
-                          - (static_cast<float>(Game::BOARD_DIM) * Tile::SIZE / 2.0f) + POS_X;
-        float xTextRight = (static_cast<float>(display::getSize().first) / 2.0f)
-                           + (static_cast<float>(Game::BOARD_DIM) * Tile::SIZE / 2.0f) - POS_X - 104.0f;
+        float yTextDown = (float)display::getSize().y - POS_Y + FONT_OFFSET_Y;
+        float xTextLeft = ((float)display::getSize().x / 2.0f) - ((float)Game::BOARD_DIM * Tile::SIZE / 2.0f) + POS_X;
+        float xTextRight = ((float)display::getSize().x / 2.0f) + ((float)Game::BOARD_DIM * Tile::SIZE / 2.0f) - POS_X - 104.0f;
 
         std::stringstream stream; // Used to convert float timers to fixed-precision strings
 

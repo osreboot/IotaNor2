@@ -7,7 +7,8 @@
 #include <glfw/glfw3.h>
 
 #include "display.h"
-#include "texture.h"
+#include "vec2f.h"
+#include "vec2i.h"
 
 static bool eventMousePress, eventMouseRelease;
 static std::map<int, bool> keyStatesLast;
@@ -21,8 +22,8 @@ void callbackMouseButton(GLFWwindow* window, int button, int action, int mods) {
 namespace display {
 
     static GLFWwindow* window;
-    static Coordw windowSize;
-    static Coordf locationCursor;
+    static vec2i windowSize;
+    static vec2f locationCursor;
 
     void initialize() {
         // TODO make the window resolution change based on monitor resolution
@@ -32,7 +33,7 @@ namespace display {
         glfwInit();
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        window = glfwCreateWindow(windowSize.first, windowSize.second, "Iota Nor - by Calvin Weaver", glfwGetPrimaryMonitor(), nullptr);
+        window = glfwCreateWindow(windowSize.x, windowSize.y, "Iota Nor - by Calvin Weaver", glfwGetPrimaryMonitor(), nullptr);
         glfwMakeContextCurrent(window);
 
         // Set the window icon (for non-fullscreen instances and when tabbed out)
@@ -56,11 +57,10 @@ namespace display {
         // Update mouse position
         double x, y;
         glfwGetCursorPos(window, &x, &y);
-        locationCursor.first = static_cast<GLfloat>(x);
-        locationCursor.second = static_cast<GLfloat>(y);
+        locationCursor = {(float)x, (float)y};
 
         // Prepare the OpenGL context for rendering
-        glViewport(0, 0, windowSize.first, windowSize.second);
+        glViewport(0, 0, windowSize.x, windowSize.y);
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
@@ -82,11 +82,11 @@ namespace display {
         return glfwWindowShouldClose(window) || glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
     }
 
-    const Coordw& getSize() {
+    const vec2i& getSize() {
         return windowSize;
     }
 
-    const Coordf& getCursor() {
+    const vec2f& getCursor() {
         return locationCursor;
     }
 

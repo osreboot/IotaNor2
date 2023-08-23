@@ -1,6 +1,8 @@
 #pragma once
 
-#include "types.h"
+#include "GL/glew.h"
+
+#include "vec2i.h"
 
 // Represents an image (to be drawn to a quad)
 class Texture {
@@ -23,7 +25,7 @@ public:
     // - 'freePixels' whether to free the pixel data after it is processed
     // - 'vFlip' whether the texture should be flipped vertically
     // - 'mipmap' whether to generate mipmaps for the texture
-    Texture(Coordw size, GLint internalFormat, GLint format, void* pixels, bool freePixels, bool vFlip, bool mipmap);
+    Texture(vec2i size, GLint internalFormat, GLint format, void* pixels, bool freePixels, bool vFlip, bool mipmap);
     ~Texture();
 
     const GLuint& getId() const { return idTexture; }

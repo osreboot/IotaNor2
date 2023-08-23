@@ -2,6 +2,7 @@
 
 #include "game/tile.h"
 #include "game/tile_floating.h"
+#include "vec2f.h"
 
 // Represents a 'piece'; a set of connected tiles that can be moved freely (off-grid) and can be rotated at 90 degree
 // intervals.
@@ -20,7 +21,7 @@ public:
     TileFloating* tiles[DIM * DIM];
 
     // Off-grid world origin
-    Coordf location;
+    vec2f location;
 
     // Represents the current 'shape' of the group. Each value is the number of tiles protruding from the middle of the
     // grid in each direction.

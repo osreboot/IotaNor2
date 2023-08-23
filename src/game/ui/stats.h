@@ -2,7 +2,6 @@
 
 #include "game/render.h"
 #include "graphics/font.h"
-#include "types.h"
 
 // Class responsible for tracking and rendering game statistics text (score, time elapsed, etc) and some other text
 class Stats {

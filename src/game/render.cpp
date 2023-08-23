@@ -33,8 +33,7 @@ Render::Render() :
             }
 
             // Send other parameters for tile refraction calculation
-            glUniform2f(glGetUniformLocation(idProgram, "windowSize"),
-                        static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second));
+            glUniform2f(glGetUniformLocation(idProgram, "windowSize"), (float)display::getSize().x, (float)display::getSize().y);
             glUniform2f(glGetUniformLocation(idProgram, "tileSize"), refractQuad->w, refractQuad->h);
             glUniform2f(glGetUniformLocation(idProgram, "tileLocation"), refractQuad->x, refractQuad->y);
         }),
@@ -89,7 +88,7 @@ Render::Render() :
 
         // Initialize quads (some values don't matter and are replaced every tick)
         quadDebugCursor(0.0f, 0.0f, 384.0f, 384.0f),
-        quadScreen(0.0f, 0.0f, static_cast<float>(display::getSize().first), static_cast<float>(display::getSize().second)),
+        quadScreen(0.0f, 0.0f, (float)display::getSize().x, (float)display::getSize().y),
         quadUiStageS(0.0f, 0.0f, 6.0f, 6.0f),
         quadUiStageL(0.0f, 0.0f, 8.0f, 8.0f),
         quadUiQueueBox(0.0f, 0.0f, Tile::SIZE * 4.0f, Tile::SIZE * 4.0f),
@@ -106,8 +105,8 @@ void Render::render(float delta, Game& game) {
     timer += delta;
 
     // Move the debug quad on top of the cursor
-    quadDebugCursor.x = display::getCursor().first - 192.0f;
-    quadDebugCursor.y = display::getCursor().second - 192.0f;
+    quadDebugCursor.x = display::getCursor().x - 192.0f;
+    quadDebugCursor.y = display::getCursor().y - 192.0f;
 
     // Update tile visuals
     for (int x = 0; x < Game::BOARD_DIM; x++) {
@@ -118,9 +117,9 @@ void Render::render(float delta, Game& game) {
 
             const float sizeEasing = 1.0f - 4.0f * powf(std::clamp(tile.visTimerShock, 0.0f, 1.0f) - 0.5f, 2.0f);
             const float size = Tile::SIZE - sizeEasing * 8.0f;
-            const Coordf world = Game::getWorld({x, y});
-            tile.quad.x = world.first + (Tile::SIZE / 2.0f) - (size / 2.0f);
-            tile.quad.y = world.second + (Tile::SIZE / 2.0f) - (size / 2.0f);
+            const vec2f world = Game::getWorld({x, y});
+            tile.quad.x = world.x + (Tile::SIZE / 2.0f) - (size / 2.0f);
+            tile.quad.y = world.y + (Tile::SIZE / 2.0f) - (size / 2.0f);
             tile.quad.w = size;
             tile.quad.h = size;
         }
@@ -152,9 +151,9 @@ void Render::render(float delta, Game& game) {
                 if (tile.timerInfect > 0.0f) {
                     const float intensityInfection = 1.0f - powf(1.0f - (tile.timerInfect / game.getStageInfectTime()), 4.0f);
                     const float sizeInfection = map(intensityInfection, 1.0f, 0.0f, 8.0f, tile.quad.w);
-                    Coordi tileWorld = Game::getWorld({x, y});
-                    quadTileInfection.x = static_cast<float>(tileWorld.first) + (Tile::SIZE / 2.0f) - (sizeInfection / 2.0f);
-                    quadTileInfection.y = static_cast<float>(tileWorld.second) + (Tile::SIZE / 2.0f) - (sizeInfection / 2.0f);
+                    vec2f tileWorld = Game::getWorld({x, y});
+                    quadTileInfection.x = tileWorld.x + (Tile::SIZE / 2.0f) - (sizeInfection / 2.0f);
+                    quadTileInfection.y = tileWorld.y + (Tile::SIZE / 2.0f) - (sizeInfection / 2.0f);
                     quadTileInfection.w = sizeInfection;
                     quadTileInfection.h = sizeInfection;
                     painter::draw(quadTileInfection, textureTileMask, shaderDefault, tile.isIlluminated() ? BLACK : WHITE);
@@ -163,11 +162,11 @@ void Render::render(float delta, Game& game) {
         }
 
         // Render queue and hold box outlines
-        quadUiQueueBox.x = Game::getOriginQueue(0).first - (quadUiQueueBox.w / 2.0f);
-        quadUiQueueBox.y = Game::getOriginQueue(0).second + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
+        quadUiQueueBox.x = Game::getOriginQueue(0).x - (quadUiQueueBox.w / 2.0f);
+        quadUiQueueBox.y = Game::getOriginQueue(0).y + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
         painter::draw(quadUiQueueBox, textureUiQueueBox, shaderDefault, WHITE);
-        quadUiQueueBox.x = Game::getOriginHold().first - (quadUiQueueBox.w / 2.0f);
-        quadUiQueueBox.y = Game::getOriginHold().second + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
+        quadUiQueueBox.x = Game::getOriginHold().x - (quadUiQueueBox.w / 2.0f);
+        quadUiQueueBox.y = Game::getOriginHold().y + (Tile::SIZE / 2.0f) - (quadUiQueueBox.h / 2.0f);
         painter::draw(quadUiQueueBox, textureUiQueueBox, shaderDefault, WHITE);
 
         if (!game.frozen) {
@@ -176,13 +175,13 @@ void Render::render(float delta, Game& game) {
 
             // Render stage pips
             for (int i = 0; i < Game::STAGES - 1; i++) {
-                quadUiStageL.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageL.w / 2.0f) -
+                quadUiStageL.x = (static_cast<float>(display::getSize().x) / 2.0f) - (quadUiStageL.w / 2.0f) -
                                  (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
-                quadUiStageL.y = static_cast<float>(display::getSize().second) - 48.0f - (quadUiStageL.h / 2.0f);
+                quadUiStageL.y = static_cast<float>(display::getSize().y) - 48.0f - (quadUiStageL.h / 2.0f);
                 painter::draw(quadUiStageL, textureUiCircle, shaderDefault, WHITE);
-                quadUiStageS.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadUiStageS.w / 2.0f) -
+                quadUiStageS.x = (static_cast<float>(display::getSize().x) / 2.0f) - (quadUiStageS.w / 2.0f) -
                                  (static_cast<float>(Game::STAGES) / 2.0f) * 64.0f + (static_cast<float>(i + 1) * 64.0f);
-                quadUiStageS.y = static_cast<float>(display::getSize().second) - 48.0f - (quadUiStageS.h / 2.0f);
+                quadUiStageS.y = static_cast<float>(display::getSize().y) - 48.0f - (quadUiStageS.h / 2.0f);
                 if(game.stage <= i) painter::draw(quadUiStageS, textureUiCircle, shaderDefault, BLACK);
             }
         }
@@ -193,7 +192,7 @@ void Render::render(float delta, Game& game) {
         // Render the audio muted icon
         if (game.audio.muted) {
             quadUiAudioMuted.x = 16.0f;
-            quadUiAudioMuted.y = static_cast<float>(display::getSize().second) - quadUiAudioMuted.h - 16.0f;
+            quadUiAudioMuted.y = (float)display::getSize().y - quadUiAudioMuted.h - 16.0f;
             painter::draw(quadUiAudioMuted, textureUiAudioMuted, shaderDefault, {1.0f, 1.0f, 1.0f, 0.6f});
         }
     });
@@ -224,8 +223,8 @@ void Render::render(float delta, Game& game) {
     // Capture floating piece groups (glass tiles and swap icons)
     quadBoardMask.w = Game::BOARD_DIM * Tile::SIZE * (2048.0f / (2048.0f - 128.0f));
     quadBoardMask.h = Game::BOARD_DIM * Tile::SIZE * (2048.0f / (2048.0f - 128.0f));
-    quadBoardMask.x = (static_cast<float>(display::getSize().first) / 2.0f) - (quadBoardMask.w / 2.0f);
-    quadBoardMask.y = (static_cast<float>(display::getSize().second) / 2.0f) - (quadBoardMask.h / 2.0f);
+    quadBoardMask.x = ((float)display::getSize().x / 2.0f) - (quadBoardMask.w / 2.0f);
+    quadBoardMask.y = ((float)display::getSize().y / 2.0f) - (quadBoardMask.h / 2.0f);
     fboMask.capture(true, [&](){
         painter::draw(quadBoardMask, textureBoardMask, shaderDefault, WHITE);
     });
@@ -262,8 +261,8 @@ void Render::render(float delta, Group& group, bool channelBoard) {
                 tile->update(delta, group.location, {x, y}); // Update floating tile state
 
                 // Adjust floating tile quad position
-                tile->quad.x = tile->visLocation.first;
-                tile->quad.y = tile->visLocation.second;
+                tile->quad.x = tile->visLocation.x;
+                tile->quad.y = tile->visLocation.y;
 
                 if (channelBoard) {
                     // Render the swap icon UI element

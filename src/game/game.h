@@ -8,6 +8,8 @@
 #include "game/tile_floating.h"
 #include "graphics/quad.h"
 #include "graphics/texture.h"
+#include "vec2f.h"
+#include "vec2i.h"
 
 // Class that manages the core game cycle
 class Game {
@@ -19,11 +21,11 @@ public:
     static const int GROUP_QUEUE_SIZE = 4; // Number of groups stored to the left of the playing field
     static const int STAGES = 8; // Number of stages that the player has to clear to win
 
-    static Coordf getWorld(Coordi tile); // Converts board ('tile') coordinate space to screen ('world') coordinates
-    static Coordi getTile(Coordf world); // Converts screen ('world') coordinate space to board ('tile') coordinates
+    static vec2f getWorld(vec2i tile); // Converts board ('tile') coordinate space to screen ('world') coordinates
+    static vec2i getTile(vec2f world); // Converts screen ('world') coordinate space to board ('tile') coordinates
 
-    static Coordf getOriginQueue(int index); // The world location for the piece queue (to the left of the board)
-    static Coordf getOriginHold(); // The world location for held piece storage (to the right of the board)
+    static vec2f getOriginQueue(int index); // The world location for the piece queue (to the left of the board)
+    static vec2f getOriginHold(); // The world location for held piece storage (to the right of the board)
 
     // Board tiles
     Tile tiles[BOARD_DIM][BOARD_DIM];
